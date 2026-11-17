@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Default = Mandarin (Simplified). English in values-en, Bahasa Indonesia in values-in. -->
+<resources>
+    <string name="app_name">量血压</string>
+    <string name="home_button">量血压</string>
+    <string name="home_hint">按大按钮</string>
+    <string name="take_photo">拍照</string>
+    <string name="speak_numbers">说数字</string>
+    <string name="yes">对</string>
+    <string name="no">不对</string>
+    <string name="done">好了</string>
+    <string name="took_medicine">吃了</string>
+    <string name="result_normal">正常</string>
+    <string name="result_high">偏高</string>
+    <string name="result_low">偏低</string>
+    <string name="family_settings">家人设置</string>
+    <string name="history">记录</string>
+    <string name="reminder_channel">提醒</string>
+    <!-- Spoken prompts (TTS fallback until recorded clips exist in res/raw) -->
+    <string name="say_reminder_bp">该量血压了。</string>
+    <string name="say_reminder_med">该吃药了。</string>
+    <string name="say_take_photo">请把血压计屏幕拍下来。</string>
+    <string name="say_speak_numbers">请说三个数字：高压，低压，心跳。</string>
+    <string name="say_readback">高压 %1$d，低压 %2$d，心跳 %3$d。对不对？</string>
+    <string name="say_retry">好，我们再来一次。</string>
+    <string name="say_photo_pills">请拍一下药。</string>
+    <string name="say_saved">记好了。</string>
+    <!-- Fixed result phrases. Family must confirm the instruction wording with her doctor. -->
+    <string name="say_result_normal">血压正常。</string>
+    <string name="say_result_high">血压偏高。请坐下休息，家人会收到通知。</string>
+    <string name="say_result_low">血压偏低。请慢慢坐下，家人会收到通知。</string>
+</resources>

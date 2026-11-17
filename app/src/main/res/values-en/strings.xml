@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Good BP</string>
+    <string name="home_button">Check BP</string>
+    <string name="home_hint">Press the big button</string>
+    <string name="take_photo">Photo</string>
+    <string name="speak_numbers">Say numbers</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="done">Done</string>
+    <string name="took_medicine">Taken</string>
+    <string name="result_normal">Normal</string>
+    <string name="result_high">High</string>
+    <string name="result_low">Low</string>
+    <string name="family_settings">Family settings</string>
+    <string name="history">History</string>
+    <string name="reminder_channel">Reminders</string>
+    <string name="say_reminder_bp">Time to check your blood pressure.</string>
+    <string name="say_reminder_med">Time for your medicine.</string>
+    <string name="say_take_photo">Please take a photo of the monitor screen.</string>
+    <string name="say_speak_numbers">Please say three numbers: top, bottom, pulse.</string>
+    <string name="say_readback">Top %1$d, bottom %2$d, pulse %3$d. Is that right?</string>
+    <string name="say_retry">Okay, let\'s try again.</string>
+    <string name="say_photo_pills">Please take a photo of the pills.</string>
+    <string name="say_saved">Saved.</string>
+    <string name="say_result_normal">Blood pressure is normal.</string>
+    <string name="say_result_high">Blood pressure is high. Please sit and rest. Your family will be told.</string>
+    <string name="say_result_low">Blood pressure is low. Please sit down slowly. Your family will be told.</string>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TODO: Bahasa Indonesia, needs a native speaker review and its own speech test. -->
+<resources>
+    <string name="app_name">Cek Tensi</string>
+    <string name="home_button">Cek Tensi</string>
+    <string name="home_hint">Tekan tombol besar</string>
+    <string name="yes">Ya</string>
+    <string name="no">Bukan</string>
+    <string name="result_normal">Normal</string>
+    <string name="result_high">Tinggi</string>
+    <string name="result_low">Rendah</string>
+</resources>
