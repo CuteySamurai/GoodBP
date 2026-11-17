@@ -10,15 +10,30 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.goodbp"
+        applicationId = "com.cuteysamurai.goodbp" // permanent once on Play; not shown to users
         minSdk = 26          // Android 8.0: covers most Oppo phones still in use
         targetSdk = 35
-        versionCode = 1
+        // CI sets VERSION_CODE from the run number so every upload is higher.
+        versionCode = (System.getenv("VERSION_CODE") ?: "1").toInt()
         versionName = "0.1.0"
     }
 
+    // Upload key comes from GitHub secrets (never committed). Without them, release stays unsigned.
+    val ks = System.getenv("UPLOAD_KEYSTORE_PATH")
+    signingConfigs {
+        if (ks != null) create("upload") {
+            storeFile = file(ks)
+            storePassword = System.getenv("UPLOAD_KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("UPLOAD_KEY_ALIAS")
+            keyPassword = System.getenv("UPLOAD_KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
-        release { isMinifyEnabled = false }
+        release {
+            isMinifyEnabled = false
+            if (ks != null) signingConfig = signingConfigs.getByName("upload")
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
