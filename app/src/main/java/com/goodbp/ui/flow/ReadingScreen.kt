@@ -122,7 +122,10 @@ fun ReadingScreen(alerts: FamilyAlerts, onFinished: () -> Unit) {
     ) {
         when (val s = state) {
             FlowState.TakePhoto -> {
-                Big(stringResource(R.string.take_photo)) { camera.launch(photoUri) }
+                Big(stringResource(R.string.take_photo)) {
+                    // No camera app (e.g. some emulators): fall back to voice instead of crashing.
+                    runCatching { camera.launch(photoUri) }.onFailure { flow.skipPhoto(); sync() }
+                }
                 Big(stringResource(R.string.speak_numbers), Color.DarkGray) { flow.skipPhoto(); sync() }
             }
             is FlowState.SpeakNumbers -> Say(stringResource(R.string.speak_numbers))

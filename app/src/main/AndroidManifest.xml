@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- No CAMERA permission: we use the system camera app via TakePicture. Declaring CAMERA
+         without granting it makes ACTION_IMAGE_CAPTURE throw a SecurityException. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Exact alarms: the doctor set specific times. USE_EXACT_ALARM is allowed for alarm/reminder apps. -->
