@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.goodbp"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.cuteysamurai.goodbp" // permanent once on Play; not shown to users
         minSdk = 26          // Android 8.0: covers most Oppo phones still in use
-        targetSdk = 35
+        targetSdk = 36
         // CI sets VERSION_CODE from the run number so every upload is higher.
         versionCode = (System.getenv("VERSION_CODE") ?: "1").toInt()
         versionName = "0.1.0"
