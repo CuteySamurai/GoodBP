@@ -50,11 +50,11 @@
     <string name="test_alarm_set">It will ring in 1 minute. Turn the screen off and wait.</string>
     <string name="cancel">Cancel</string>
     <string name="bp_range">Blood pressure range</string>
-    <string name="range_from_doctor">Using the doctor's range.</string>
-    <string name="range_placeholder">Using a default range. Please enter the doctor's numbers.</string>
+    <string name="range_from_doctor">Using the doctor\'s range.</string>
+    <string name="range_placeholder">Using a default range. Please enter the doctor\'s numbers.</string>
     <string name="low_below">Low below</string>
     <string name="high_above">High above</string>
     <string name="range_invalid">Please check the numbers.</string>
-    <string name="save_doctor_range">Save doctor's range</string>
+    <string name="save_doctor_range">Save doctor\'s range</string>
     <string name="phone_setup">Phone setup (Oppo)</string>
 </resources>
