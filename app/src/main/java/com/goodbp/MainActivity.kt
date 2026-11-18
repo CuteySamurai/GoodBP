@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
                         HomeScreen(onStart = { nav.navigate("reading") }, onFamilyLongPress = { nav.navigate("family") })
                     }
                     composable("reading") { ReadingScreen(alerts, onFinished = { nav.popBackStack("home", false) }) }
-                    composable("family") { FamilySetupScreen(onHistory = { nav.navigate("history") }) }
+                    composable("family") { FamilySetupScreen(onHistory = { nav.navigate("history") }, onLanguageChanged = { recreate() }) }
                     composable("history") { HistoryScreen() }
                 }
             }

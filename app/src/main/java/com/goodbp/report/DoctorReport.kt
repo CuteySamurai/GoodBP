@@ -14,6 +14,18 @@ import java.util.Locale
  * TODO (report step): chart image, medicine confirmations side by side, sharing.
  */
 object DoctorReport {
+    /** Writes the PDF and opens the share sheet (WhatsApp, email, print...). */
+    fun share(context: Context, readings: List<Reading>) {
+        val file = write(context, readings.sortedBy { it.takenAt })
+        val uri = androidx.core.content.FileProvider.getUriForFile(context, "${context.packageName}.files", file)
+        val send = android.content.Intent(android.content.Intent.ACTION_SEND)
+            .setType("application/pdf")
+            .putExtra(android.content.Intent.EXTRA_STREAM, uri)
+            .addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        context.startActivity(android.content.Intent.createChooser(send, null)
+            .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+
     fun write(context: Context, readings: List<Reading>): File {
         val doc = PdfDocument()
         val paint = Paint().apply { textSize = 11f }

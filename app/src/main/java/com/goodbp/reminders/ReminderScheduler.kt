@@ -16,9 +16,33 @@ object ReminderScheduler {
     const val EXTRA_KIND = "kind"          // BP or MED
     const val EXTRA_MINUTES = "minutes"
     const val EXTRA_MED_ID = "med_id"
+    const val EXTRA_TEST = "test"
+    private const val TEST_REQUEST = 999_999
 
     fun scheduleBp(context: Context, minutesOfDay: List<Int>) =
         minutesOfDay.forEach { schedule(context, Kind.BP, it, medId = 0) }
+
+    /** Family changed the times: cancel the old alarms, set the new ones. */
+    fun replaceBp(context: Context, old: List<Int>, new: List<Int>) {
+        (old - new.toSet()).forEach { cancel(context, Kind.BP, it, medId = 0) }
+        scheduleBp(context, new)
+    }
+
+    fun cancel(context: Context, kind: Kind, minutesOfDay: Int, medId: Long) {
+        val am = context.getSystemService(AlarmManager::class.java)
+        am.cancel(pendingIntent(context, kind, minutesOfDay, medId))
+    }
+
+    /** One-off test alarm, so the family can check it fires with the screen off. */
+    fun scheduleTest(context: Context, inSeconds: Int) {
+        val am = context.getSystemService(AlarmManager::class.java)
+        val intent = Intent(context, ReminderReceiver::class.java)
+            .putExtra(EXTRA_KIND, Kind.BP.name)
+            .putExtra(EXTRA_TEST, true)
+        val pi = PendingIntent.getBroadcast(context, TEST_REQUEST, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + inSeconds * 1000L, pi)
+    }
 
     fun schedule(context: Context, kind: Kind, minutesOfDay: Int, medId: Long) {
         val am = context.getSystemService(AlarmManager::class.java)

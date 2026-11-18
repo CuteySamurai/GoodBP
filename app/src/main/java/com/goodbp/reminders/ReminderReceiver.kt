@@ -17,7 +17,8 @@ class ReminderReceiver : BroadcastReceiver() {
         val minutes = intent.getIntExtra(ReminderScheduler.EXTRA_MINUTES, 480)
         val medId = intent.getLongExtra(ReminderScheduler.EXTRA_MED_ID, 0)
 
-        ReminderScheduler.schedule(context, kind, minutes, medId) // tomorrow
+        val isTest = intent.getBooleanExtra(ReminderScheduler.EXTRA_TEST, false)
+        if (!isTest) ReminderScheduler.schedule(context, kind, minutes, medId) // tomorrow
 
         val nm = context.getSystemService(NotificationManager::class.java)
         nm.createNotificationChannel(
