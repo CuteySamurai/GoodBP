@@ -58,4 +58,16 @@
     <string name="save_doctor_range">Save doctor\'s range</string>
     <string name="phone_setup">Phone setup (Oppo)</string>
     <string name="hold_for_family">Family: press and hold to open settings</string>
+    <string name="back">← Back</string>
+    <string name="listen">🔊 Listen</string>
+    <string name="say_no_history">No readings yet.</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="date_md">%2$d/%1$d</string>
+    <string name="morning">morning</string>
+    <string name="noon">noon</string>
+    <string name="afternoon">afternoon</string>
+    <string name="evening">evening</string>
+    <string name="day_part">%1$s %2$s</string>
+    <string name="say_history_item">%1$s: top %2$d, bottom %3$d, %4$s.</string>
 </resources>

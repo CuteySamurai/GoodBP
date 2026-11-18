@@ -61,4 +61,16 @@
     <string name="save_doctor_range">保存医生的范围</string>
     <string name="phone_setup">手机设置 (Oppo)</string>
     <string name="hold_for_family">家人：长按打开设置</string>
+    <string name="back">← 回去</string>
+    <string name="listen">🔊 听</string>
+    <string name="say_no_history">还没有记录。</string>
+    <string name="today">今天</string>
+    <string name="yesterday">昨天</string>
+    <string name="date_md">%1$d月%2$d日</string>
+    <string name="morning">早上</string>
+    <string name="noon">中午</string>
+    <string name="afternoon">下午</string>
+    <string name="evening">晚上</string>
+    <string name="day_part">%1$s%2$s</string>
+    <string name="say_history_item">%1$s，高压 %2$d，低压 %3$d，%4$s。</string>
 </resources>

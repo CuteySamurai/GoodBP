@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -32,9 +33,12 @@ import com.goodbp.R
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen(onStart: () -> Unit, onFamilyLongPress: () -> Unit) {
+fun HomeScreen(onStart: () -> Unit, onHistory: () -> Unit, onFamilyLongPress: () -> Unit) {
     Box(Modifier.fillMaxSize()) {
-        BigButtonScreen(label = stringResource(R.string.home_button), onPress = onStart)
+        BigButtonScreen(
+            label = stringResource(R.string.home_button), onPress = onStart,
+            secondaryLabel = "📋  " + stringResource(R.string.history), onSecondary = onHistory,
+        )
         val context = androidx.compose.ui.platform.LocalContext.current
         val hint = stringResource(R.string.hold_for_family)
         Box(
@@ -55,7 +59,13 @@ fun HomeScreen(onStart: () -> Unit, onFamilyLongPress: () -> Unit) {
 }
 
 @Composable
-fun BigButtonScreen(label: String, onPress: () -> Unit, color: Color = MaterialTheme.colorScheme.primary) {
+fun BigButtonScreen(
+    label: String,
+    onPress: () -> Unit,
+    color: Color = MaterialTheme.colorScheme.primary,
+    secondaryLabel: String? = null,
+    onSecondary: () -> Unit = {},
+) {
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
             Modifier.fillMaxSize().padding(24.dp),
@@ -69,6 +79,17 @@ fun BigButtonScreen(label: String, onPress: () -> Unit, color: Color = MaterialT
                 modifier = Modifier.fillMaxWidth().aspectRatio(1f),
             ) {
                 Text(label, style = MaterialTheme.typography.displayLarge, textAlign = TextAlign.Center)
+            }
+            if (secondaryLabel != null) {
+                androidx.compose.foundation.layout.Spacer(Modifier.size(32.dp))
+                // Second, clearly smaller button so the main action stays obvious.
+                Button(
+                    onClick = onSecondary,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5F6368)),
+                    modifier = Modifier.fillMaxWidth().height(120.dp),
+                ) {
+                    Text(secondaryLabel, style = MaterialTheme.typography.headlineLarge)
+                }
             }
         }
     }
