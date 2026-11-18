@@ -60,4 +60,5 @@
     <string name="range_invalid">数字不对，请检查。</string>
     <string name="save_doctor_range">保存医生的范围</string>
     <string name="phone_setup">手机设置 (Oppo)</string>
+    <string name="hold_for_family">家人：长按打开设置</string>
 </resources>

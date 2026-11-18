@@ -57,4 +57,5 @@
     <string name="range_invalid">Please check the numbers.</string>
     <string name="save_doctor_range">Save doctor\'s range</string>
     <string name="phone_setup">Phone setup (Oppo)</string>
+    <string name="hold_for_family">Family: press and hold to open settings</string>
 </resources>

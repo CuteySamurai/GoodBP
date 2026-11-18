@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.goodbp.R
 
 /**
@@ -34,12 +35,22 @@ import com.goodbp.R
 fun HomeScreen(onStart: () -> Unit, onFamilyLongPress: () -> Unit) {
     Box(Modifier.fillMaxSize()) {
         BigButtonScreen(label = stringResource(R.string.home_button), onPress = onStart)
+        val context = androidx.compose.ui.platform.LocalContext.current
+        val hint = stringResource(R.string.hold_for_family)
         Box(
             Modifier
                 .align(Alignment.TopEnd)
-                .size(72.dp)
-                .combinedClickable(onClick = {}, onLongClick = onFamilyLongPress)
-        )
+                .padding(8.dp)
+                .size(64.dp)
+                .combinedClickable(
+                    onClick = { android.widget.Toast.makeText(context, hint, android.widget.Toast.LENGTH_SHORT).show() },
+                    onLongClick = onFamilyLongPress,
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            // Small, grey gear: visible to family, but a tap alone does nothing for her.
+            Text("⚙", fontSize = 28.sp, color = Color.LightGray)
+        }
     }
 }
 
