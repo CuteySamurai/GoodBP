@@ -24,31 +24,40 @@ object SegmentReader {
     }
 
     private const val MAX_SIDE = 1000
+    /** Give up (and offer the keypad) rather than keep her waiting. */
+    private const val TIME_BUDGET_MS = 9000L
 
     fun read(src: Gray): Triple<Int, Int, Int>? {
         val img = resize(src, MAX_SIDE)
+        val deadline = System.currentTimeMillis() + TIME_BUDGET_MS
         // A photo held a little crooked: try small turns if straight fails.
-        for (deg in listOf(0.0, -4.0, 4.0, -8.0, 8.0)) {
-            val r = readUpright(if (deg == 0.0) img else rotate(img, deg))
+        for (deg in listOf(0.0, -4.0, 4.0)) {
+            if (System.currentTimeMillis() > deadline) break
+            val r = readUpright(if (deg == 0.0) img else rotate(img, deg), deadline)
             if (r != null) return r
         }
         return null
     }
 
     /**
-     * Several ink levels and grouping distances: dim, shadowed or glared screens
-     * each suit a different one. Every setting votes; three agreeing settings are needed.
+     * Many settings each read the photo: ink level, background window (small windows
+     * follow shadow edges, large ones ignore ghost segments) and grouping distance.
+     * The answer must win clearly: at least 3 votes and twice any other answer.
+     * Otherwise we ask her to type it, rather than risk wrong numbers.
      */
-    private fun readUpright(img: Gray): Triple<Int, Int, Int>? {
-        val votes = LinkedHashMap<Triple<Int, Int, Int>, Int>()
-        for (t in listOf(0.5, 0.4, 0.6, 0.3)) for (rf in listOf(0.5, 0.8)) {
-            val r = pick(numbers(img, t, rf)) ?: continue
-            val n = (votes[r] ?: 0) + 1
-            if (n >= 3) return r
-            votes[r] = n
+    private fun readUpright(img: Gray, deadline: Long): Triple<Int, Int, Int>? {
+        val votes = HashMap<Triple<Int, Int, Int>, Int>()
+        for (rd in listOf(40, 60, 80)) for (t in listOf(0.5, 0.4, 0.6, 0.3, -0.6, -0.7, -0.8)) for (rf in listOf(0.5, 0.8)) {
+            if (System.currentTimeMillis() > deadline) break
+            val r = pick(numbers(img, t, rf, rd)) ?: continue
+            votes[r] = (votes[r] ?: 0) + 1
+            val sorted = votes.values.sortedDescending()
+            if (sorted[0] >= 5 && sorted.size == 1) return r
         }
-        // One or two votes are too shaky (glare can turn a 0 into a 3): better to ask.
-        return null
+        val ranked = votes.entries.sortedByDescending { it.value }
+        val top = ranked.firstOrNull() ?: return null
+        val second = ranked.getOrNull(1)?.value ?: 0
+        return if (top.value >= 3 && top.value >= 2 * second) top.key else null
     }
 
     // ---------------------------------------------------------------- image prep
@@ -111,9 +120,35 @@ object SegmentReader {
      * so dim, shadowed or glared parts of the screen all work, and the faint
      * "ghost" segments of an LCD stay out when real digits are near.
      */
-    internal fun darkMask(img: Gray, level: Double): BooleanArray {
+    internal fun darkMask(img: Gray, level: Double, rDiv: Int = 40): BooleanArray {
         val w = img.w; val h = img.h
-        val r = max(6, max(w, h) / 40)
+        val (bg, lo) = backgrounds(img, rDiv)
+        val m = BooleanArray(w * h)
+        if (level < 0) {
+            // Shadow mode: compare each pixel with the screen brightness right there.
+            // A shadow dims ink and background alike, so lit segments stay at about the
+            // same fraction of the background while faint unlit "ghost" segments don't.
+            val k = -level
+            for (i in m.indices) { val b = bg[i]; val p = img.px[i]; m[i] = p < b * k && b - p >= 15 }
+            return m
+        }
+        for (i in m.indices) {
+            val b = bg[i]; val d = lo[i]; val p = img.px[i]
+            m[i] = b - d >= 18 && p < d + level * (b - d) && p < b - 10
+        }
+        return m
+    }
+
+    private var cacheKey: Pair<Gray, Int>? = null
+    private var cacheVal: Pair<IntArray, IntArray>? = null
+
+    /** Background (closing) and local darkest value; the same for every ink level, so kept. */
+    @Synchronized
+    private fun backgrounds(img: Gray, rDiv: Int): Pair<IntArray, IntArray> {
+        val key = img to rDiv
+        if (cacheKey?.first === img && cacheKey?.second == rDiv) return cacheVal!!
+        val w = img.w; val h = img.h
+        val r = max(6, max(w, h) / rDiv)
         val tmp = IntArray(w * h); val bg = IntArray(w * h); val lo = IntArray(w * h)
         for (y in 0 until h) slidingMax(img.px, y * w, 1, w, r, tmp, 1)
         for (x in 0 until w) slidingMax(tmp, x, w, h, r, bg, 1)
@@ -121,12 +156,8 @@ object SegmentReader {
         for (x in 0 until w) slidingMax(tmp, x, w, h, r, bg, -1)
         for (y in 0 until h) slidingMax(img.px, y * w, 1, w, r, tmp, -1)
         for (x in 0 until w) slidingMax(tmp, x, w, h, r, lo, -1)
-        val m = BooleanArray(w * h)
-        for (i in m.indices) {
-            val b = bg[i]; val d = lo[i]; val p = img.px[i]
-            m[i] = b - d >= 18 && p < d + level * (b - d) && p < b - 10
-        }
-        return m
+        cacheKey = key; cacheVal = bg to lo
+        return cacheVal!!
     }
 
     /** Running max (sign 1) or min (sign -1) over +-r along one row or column. */
@@ -322,16 +353,21 @@ object SegmentReader {
         var bits = 0
         segs.forEachIndexed { i, f -> if (f > 0.22) bits = bits or (1 shl i) }
         // A segment that is neither clearly on nor clearly off (glare, blur) makes the digit unsure.
-        if (segs.any { it in 0.12..0.32 }) return bits to null
-        return bits to patterns[bits]
+        if (segs.any { it in 0.12..0.36 }) return bits to null
+        patterns[bits]?.let { return bits to it }
+        // A shadow edge can hide one segment. Accept the digit only if exactly one
+        // digit matches with one extra segment (never by removing ink).
+        val near = patterns.filter { (p, d) -> d != 1 && p and bits == bits && Integer.bitCount(p xor bits) == 1 }
+            .values.toSet()
+        return bits to near.singleOrNull()
     }
 
     // ---------------------------------------------------------------- numbers
 
     private class Read(val g: Blob, val bits: Int, val digit: Int?)
 
-    private fun readLines(img: Gray, ratio: Double, reachFactor: Double): List<List<Read>> {
-        val m = darkMask(img, ratio)
+    private fun readLines(img: Gray, ratio: Double, reachFactor: Double, rDiv: Int): List<List<Read>> {
+        val m = darkMask(img, ratio, rDiv)
         val w = img.w
         val kept = blobs(m, w, img.h)
         // Ink that survived the blob filters, for re-reading whole bands below.
@@ -376,10 +412,10 @@ object SegmentReader {
         return first + second
     }
 
-    fun numbers(img: Gray, ratio: Double = 0.5, reachFactor: Double = 0.5): List<Num> {
+    fun numbers(img: Gray, ratio: Double = 0.5, reachFactor: Double = 0.5, rDiv: Int = 40): List<Num> {
         // Chain readable digits of the same size on the same line, left to right
         // (across clusters: a lone "1" often stands apart from the rest).
-        val reads = readLines(img, ratio, reachFactor).flatten().filter { it.digit != null }.sortedBy { it.g.x0 }
+        val reads = readLines(img, ratio, reachFactor, rDiv).flatten().filter { it.digit != null }.sortedBy { it.g.x0 }
         val chains = ArrayList<MutableList<Read>>()
         for (r in reads) {
             val chain = chains.filter { c ->
@@ -449,7 +485,7 @@ object SegmentReader {
 
     /** Test hook: every glyph per line with its box, segment bits and digit. */
     internal fun inspect(img: Gray, ratio: Double): List<String> =
-        readLines(img, ratio, 0.5).filter { it.isNotEmpty() }.map { line ->
+        readLines(img, ratio, 0.5, 40).filter { it.isNotEmpty() }.map { line ->
             line.joinToString("  ") { r -> "[${r.g.x0},${r.g.y0} ${r.g.w}x${r.g.h} ${Integer.toBinaryString(r.bits)}=${r.digit}]" }
         }
 

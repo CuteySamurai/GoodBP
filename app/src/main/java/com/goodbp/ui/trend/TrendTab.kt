@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -82,19 +84,20 @@ fun TrendTab() {
     LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item {
             Text(stringResource(R.string.tab_trend), style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(top = 12.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // One line, never wrapped ("1 yea r"); swipe sideways if a language is long.
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf(Period.D7 to R.string.p_7d, Period.W4 to R.string.p_4w, Period.M3 to R.string.p_3m, Period.Y1 to R.string.p_1y).forEach { (p, l) ->
-                    FilterChip(period == p, { period = p }, label = { Text(stringResource(l), fontSize = 18.sp) })
+                    FilterChip(period == p, { period = p }, label = { Text(stringResource(l), fontSize = 17.sp, maxLines = 1, softWrap = false) })
                 }
             }
         }
         item {
             // Time-of-day filter; chip colour = dot colour on the chart
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 listOf(null to R.string.all, 0 to R.string.morning, 1 to R.string.afternoon, 2 to R.string.evening).forEach { (p, l) ->
                     FilterChip(part == p, { part = p },
                         leadingIcon = if (p == null) null else { { Dot(partColor(p)) } },
-                        label = { Text(stringResource(l), fontSize = 16.sp) })
+                        label = { Text(stringResource(l), fontSize = 16.sp, maxLines = 1, softWrap = false) })
                 }
             }
         }
