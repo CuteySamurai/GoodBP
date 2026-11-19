@@ -1,6 +1,7 @@
 package com.goodbp
 
 import com.goodbp.capture.MonitorTextParser
+import com.goodbp.rules.BpCategory
 import com.goodbp.rules.BpRange
 import com.goodbp.rules.BpResult
 import com.goodbp.rules.BpRules
@@ -36,6 +37,18 @@ class CoreLogicTest {
         assertEquals(listOf(200), MandarinNumberParser.parseNumbers("两百"))
         assertEquals(Triple(98, 58, 64), MandarinNumberParser.parseReading("九十八 五十八 六十四"))
         assertNull(MandarinNumberParser.parseReading("一百二十 八十"))
+    }
+
+    @Test fun categories() {
+        assertEquals(BpCategory.LOW, BpCategory.of(88, 70))
+        assertEquals(BpCategory.LOW, BpCategory.of(110, 58))
+        assertEquals(BpCategory.NORMAL, BpCategory.of(118, 76))
+        assertEquals(BpCategory.PRE, BpCategory.of(118, 84))
+        assertEquals(BpCategory.STAGE1, BpCategory.of(145, 85))
+        assertEquals(BpCategory.STAGE2, BpCategory.of(130, 102))
+        assertEquals(BpCategory.CRISIS, BpCategory.of(185, 95))
+        val f = BpCategory.fraction(130, 70)
+        assertTrue(f > 0.4f && f < 0.6f)
     }
 
     @Test fun ocrConfusions() {

@@ -21,10 +21,9 @@ object BpRules {
      * numbers are entered. The family MUST replace these with the doctor's range.
      * TODO: confirm defaults with her doctor; values here are generic placeholders.
      */
-    fun defaultRangeFor(age: Int): BpRange = when {
-        age >= 65 -> BpRange(sysLow = 100, sysHigh = 150, diaLow = 60, diaHigh = 90, source = BpRange.Source.AGE_DEFAULT)
-        else -> BpRange(sysLow = 90, sysHigh = 140, diaLow = 60, diaHigh = 90, source = BpRange.Source.AGE_DEFAULT)
-    }
+    fun defaultRangeFor(@Suppress("UNUSED_PARAMETER") age: Int): BpRange =
+        // Low below 90/60 (family's rule); high from 140/90 (Stage 1 on the family's chart).
+        BpRange(sysLow = 90, sysHigh = 139, diaLow = 60, diaHigh = 89, source = BpRange.Source.AGE_DEFAULT)
 
     /** LOW wins over HIGH: low blood pressure is what made her faint. */
     fun classify(sys: Int, dia: Int, range: BpRange): BpResult = when {

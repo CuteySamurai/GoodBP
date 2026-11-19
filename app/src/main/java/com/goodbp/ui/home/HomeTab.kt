@@ -117,6 +117,6 @@ private fun LatestCard(r: Reading, range: com.goodbp.rules.BpRange, onTap: () ->
             Text(" bpm", fontSize = 18.sp, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
         }
         Spacer(Modifier.height(10.dp))
-        BpIndicator(r.systolic, r.diastolic, range)
+        BpIndicator(r.systolic, r.diastolic)
     }
 }

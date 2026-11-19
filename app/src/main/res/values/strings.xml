@@ -113,4 +113,11 @@
     <string name="yes_mark">Yes ✓</string>
     <string name="no_mark">No ✗</string>
     <string name="photo_unreadable">Couldn\'t read the photo. Please type the numbers.</string>
+    <string name="cat_low">Low</string>
+    <string name="cat_normal">Normal</string>
+    <string name="cat_pre">Pre-high</string>
+    <string name="cat_stage1">High 1</string>
+    <string name="cat_stage2">High 2</string>
+    <string name="cat_crisis">Very high</string>
+    <string name="reference_note">Reference chart only, not a diagnosis.</string>
 </resources>

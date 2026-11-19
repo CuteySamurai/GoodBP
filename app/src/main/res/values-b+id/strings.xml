@@ -114,4 +114,11 @@
     <string name="yes_mark">Ya ✓</string>
     <string name="no_mark">Tidak ✗</string>
     <string name="photo_unreadable">Foto tidak terbaca. Silakan ketik angkanya.</string>
+    <string name="cat_low">Rendah</string>
+    <string name="cat_normal">Normal</string>
+    <string name="cat_pre">Pra-tinggi</string>
+    <string name="cat_stage1">Tinggi 1</string>
+    <string name="cat_stage2">Tinggi 2</string>
+    <string name="cat_crisis">Sangat tinggi</string>
+    <string name="reference_note">Hanya acuan, bukan diagnosis.</string>
 </resources>
