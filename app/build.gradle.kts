@@ -6,6 +6,9 @@ plugins {
 }
 
 android {
+    // The app has its own language picker, so Play must install every language,
+    // not only the phone's (otherwise Chinese/Bahasa strings are missing on the phone).
+    bundle { language { enableSplit = false } }
     namespace = "com.goodbp"
     compileSdk = 36
 
@@ -15,7 +18,7 @@ android {
         targetSdk = 36
         // CI sets VERSION_CODE from the run number so every upload is higher.
         versionCode = (System.getenv("VERSION_CODE") ?: "1").toInt()
-        versionName = "0.5.0"
+        versionName = "0.5.1"
     }
 
     // Upload key comes from GitHub secrets (never committed). Without them, release stays unsigned.

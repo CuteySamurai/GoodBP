@@ -132,6 +132,9 @@ private fun LanguageSection(settings: Settings, onChanged: () -> Unit) =
                     label = { Text(names.getValue(lang)) })
             }
         }
+        val ctx = LocalContext.current
+        val version = remember { runCatching { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName }.getOrNull() ?: "" }
+        Text("v$version", fontSize = Small, color = androidx.compose.ui.graphics.Color.Gray)
     }
 
 @Composable
