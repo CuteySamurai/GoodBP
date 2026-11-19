@@ -127,6 +127,7 @@ fun ReadingScreen(alerts: FamilyAlerts, startManual: Boolean, onFinished: () -> 
                     }
                     Text(word, style = MaterialTheme.typography.displayLarge, color = color)
                     Numbers(s.sys, s.dia, s.pulse)
+                    com.goodbp.ui.home.BpIndicator(s.sys, s.dia, settings.range())
                     Big(stringResource(R.string.done), onClick = onFinished)
                 }
                 else -> {}

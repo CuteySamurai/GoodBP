@@ -61,7 +61,7 @@ fun HomeTab(onPhoto: () -> Unit, onManual: () -> Unit) {
         if (last == null) {
             Text(stringResource(R.string.no_readings), fontSize = 24.sp, color = Color.Gray, modifier = Modifier.padding(vertical = 24.dp))
         } else {
-            LatestCard(last) { speaker.say(spoken(context, last)) }
+            LatestCard(last, settings.range()) { speaker.say(spoken(context, last)) }
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -89,7 +89,7 @@ fun HomeTab(onPhoto: () -> Unit, onManual: () -> Unit) {
 }
 
 @Composable
-private fun LatestCard(r: Reading, onTap: () -> Unit) {
+private fun LatestCard(r: Reading, range: com.goodbp.rules.BpRange, onTap: () -> Unit) {
     val context = LocalContext.current
     val (color, mark) = resultStyle(r.result)
     Column(
@@ -116,5 +116,7 @@ private fun LatestCard(r: Reading, onTap: () -> Unit) {
             Text("${r.pulse}", fontSize = 48.sp, fontWeight = FontWeight.Bold)
             Text(" bpm", fontSize = 18.sp, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
         }
+        Spacer(Modifier.height(10.dp))
+        BpIndicator(r.systolic, r.diastolic, range)
     }
 }
