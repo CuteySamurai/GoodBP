@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -68,11 +69,14 @@ fun TrendTab() {
     var showDia by remember { mutableStateOf(true) }
     var showPulse by remember { mutableStateOf(true) }
     var toDelete by remember { mutableStateOf<Reading?>(null) }
+    var part by remember { mutableStateOf<Int?>(null) } // null = all times of day
 
     val now = System.currentTimeMillis()
     val cut = now - period.days * 86_400_000L
-    val shown = all.filter { it.takenAt >= cut }
-    val previous = all.filter { it.takenAt in (cut - period.days * 86_400_000L) until cut }
+    fun inPart(r: Reading) = part == null || partOf(hourOf(r)) == part
+    val inPeriod = all.filter { it.takenAt >= cut }
+    val shown = inPeriod.filter(::inPart)
+    val previous = all.filter { it.takenAt in (cut - period.days * 86_400_000L) until cut && inPart(it) }
     val points = remember(shown, period) { toPoints(shown.sortedBy { it.takenAt }, period.group) }
 
     LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -81,6 +85,16 @@ fun TrendTab() {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf(Period.D7 to R.string.p_7d, Period.W4 to R.string.p_4w, Period.M3 to R.string.p_3m, Period.Y1 to R.string.p_1y).forEach { (p, l) ->
                     FilterChip(period == p, { period = p }, label = { Text(stringResource(l), fontSize = 18.sp) })
+                }
+            }
+        }
+        item {
+            // Time-of-day filter; chip colour = dot colour on the chart
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                listOf(null to R.string.all, 0 to R.string.morning, 1 to R.string.afternoon, 2 to R.string.evening).forEach { (p, l) ->
+                    FilterChip(part == p, { part = p },
+                        leadingIcon = if (p == null) null else { { Dot(partColor(p)) } },
+                        label = { Text(stringResource(l), fontSize = 16.sp) })
                 }
             }
         }
@@ -95,6 +109,7 @@ fun TrendTab() {
                 Toggle(stringResource(R.string.pulse), PulseColor, showPulse, Modifier.weight(1f)) { showPulse = !showPulse }
             }
         }
+        if (inPeriod.isNotEmpty()) item { PartAverages(inPeriod) }
         if (shown.isNotEmpty()) {
             item { TrendLine(shown, previous) }
             item { SummaryTable(shown) }
@@ -146,7 +161,7 @@ private fun TrendLine(now: List<Reading>, prev: List<Reading>) {
 /** Max / Min / Avg, overall and by time of day (like a paper BP diary). */
 @Composable
 private fun SummaryTable(rs: List<Reading>) {
-    fun hour(r: Reading) = Calendar.getInstance().apply { timeInMillis = r.takenAt }.get(Calendar.HOUR_OF_DAY)
+    fun hour(r: Reading) = hourOf(r)
     val groups = listOf(
         R.string.overall to rs,
         R.string.morning to rs.filter { hour(it) < 12 },
@@ -181,7 +196,7 @@ private fun toPoints(rs: List<Reading>, group: Group): List<ChartPoint> {
         t, g.map { it.systolic }.average().toInt(), g.map { it.diastolic }.average().toInt(),
         g.map { it.pulse }.average().toInt(), label(t))
     return when (group) {
-        Group.EACH -> rs.map { ChartPoint(it.takenAt, it.systolic, it.diastolic, it.pulse, label(it.takenAt)) }
+        Group.EACH -> rs.map { ChartPoint(it.takenAt, it.systolic, it.diastolic, it.pulse, label(it.takenAt), partOf(hourOf(it))) }
         Group.DAY -> rs.groupBy { localDay(it.takenAt) }.values.map { avg(it.first().takenAt, it) }
         Group.WEEK -> rs.groupBy { localDay(it.takenAt) / 7 }.values.map { avg(it.first().takenAt, it) }
     }
@@ -189,3 +204,26 @@ private fun toPoints(rs: List<Reading>, group: Group): List<ChartPoint> {
 
 /** Day number in the phone's time zone (so 1am Singapore isn't counted as yesterday). */
 private fun localDay(t: Long): Long = (t + java.util.TimeZone.getDefault().getOffset(t)) / 86_400_000L
+
+private fun hourOf(r: Reading) = Calendar.getInstance().apply { timeInMillis = r.takenAt }.get(Calendar.HOUR_OF_DAY)
+
+/** "Morning 138/85 · Afternoon 130/82 · Evening 128/80", each with its dot colour. */
+@Composable
+private fun PartAverages(rs: List<Reading>) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        listOf(0 to R.string.morning, 1 to R.string.afternoon, 2 to R.string.evening).forEach { (p, l) ->
+            val g = rs.filter { partOf(hourOf(it)) == p }
+            Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                    Dot(partColor(p))
+                    Text(" " + stringResource(l), fontSize = 16.sp)
+                }
+                Text(if (g.isEmpty()) "–" else "${g.map { it.systolic }.average().toInt()}/${g.map { it.diastolic }.average().toInt()}",
+                    fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+@Composable
+private fun Dot(c: Color) = androidx.compose.foundation.Canvas(Modifier.size(12.dp)) { drawCircle(c) }

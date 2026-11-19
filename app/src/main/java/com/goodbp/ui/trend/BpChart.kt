@@ -22,8 +22,16 @@ val SysColor = Color(0xFF2E7D32)
 val DiaColor = Color(0xFF1565C0)
 val PulseColor = Color(0xFFC62828)
 
-/** One point on the chart: a single reading, or an average for a day/week. */
-data class ChartPoint(val t: Long, val sys: Int, val dia: Int, val pulse: Int, val label: String)
+val MorningColor = Color(0xFFF57C00)
+val AfternoonColor = Color(0xFF43A047)
+val EveningColor = Color(0xFF1E88E5)
+
+/** 0 = morning (<12), 1 = afternoon (12-17), 2 = evening (18+). */
+fun partOf(hour: Int) = when { hour < 12 -> 0; hour < 18 -> 1; else -> 2 }
+fun partColor(part: Int) = when (part) { 0 -> MorningColor; 1 -> AfternoonColor; else -> EveningColor }
+
+/** One point on the chart: a single reading (with its time of day), or an average for a day/week (part = null). */
+data class ChartPoint(val t: Long, val sys: Int, val dia: Int, val pulse: Int, val label: String, val part: Int? = null)
 
 /**
  * Line chart (hand-drawn, no library). Points are evenly spaced so gaps between
@@ -79,8 +87,13 @@ fun BpChart(
             val path = Path()
             points.forEachIndexed { i, p -> if (i == 0) path.moveTo(x(i), y(v(p))) else path.lineTo(x(i), y(v(p))) }
             drawPath(path, color, style = Stroke(width = 3.dp.toPx()))
-            val r = if (n > 40) 2.5.dp.toPx() else 5.dp.toPx()
-            points.forEachIndexed { i, p -> drawCircle(color, r, Offset(x(i), y(v(p)))) }
+            val r = if (n > 40) 3.dp.toPx() else 6.dp.toPx()
+            // Dot = time-of-day colour (morning/afternoon/evening), ringed in the series colour.
+            points.forEachIndexed { i, p ->
+                val o = Offset(x(i), y(v(p)))
+                drawCircle(color, r, o)
+                p.part?.let { drawCircle(partColor(it), r * 0.6f, o) }
+            }
         }
         if (showPulse) series(PulseColor) { it.pulse }
         if (showDia) series(DiaColor) { it.dia }
