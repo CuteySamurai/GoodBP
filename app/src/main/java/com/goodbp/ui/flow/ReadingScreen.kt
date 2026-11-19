@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.goodbp.ui.common.spokenSummary
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -80,17 +81,10 @@ fun ReadingScreen(alerts: FamilyAlerts, startManual: Boolean, onFinished: () -> 
     LaunchedEffect(Unit) { if (!startManual && !autoOpened) { autoOpened = true; openCamera() } }
 
     val sReadback = stringResource(R.string.say_readback)
-    val sNormal = stringResource(R.string.say_result_normal)
-    val sHigh = stringResource(R.string.say_result_high)
-    val sLow = stringResource(R.string.say_result_low)
     LaunchedEffect(state) {
         when (val s = state) {
             is FlowState.ReadBack -> speaker.say(String.format(sReadback, s.sys, s.dia, s.pulse))
-            is FlowState.Result -> when (s.result) {
-                BpResult.NORMAL -> speaker.sayPrompt("say_result_normal", sNormal)
-                BpResult.HIGH -> speaker.sayPrompt("say_result_high", sHigh)
-                BpResult.LOW -> speaker.sayPrompt("say_result_low", sLow)
-            }
+            is FlowState.Result -> speaker.say(spokenSummary(context, System.currentTimeMillis(), s.sys, s.dia, s.pulse))
             else -> {}
         }
     }

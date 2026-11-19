@@ -89,6 +89,16 @@ fun startOfDay(c: Calendar): Long = (c.clone() as Calendar).apply {
 }.timeInMillis
 
 /** What gets spoken when a reading is tapped. */
-fun spoken(context: Context, r: Reading): String =
-    context.getString(R.string.say_history_item, whenLabel(context, r.takenAt), r.systolic, r.diastolic, resultWord(context, r.result)) +
-        " " + context.getString(R.string.say_pulse, r.pulse)
+fun spoken(context: Context, r: Reading): String = spokenSummary(context, r.takenAt, r.systolic, r.diastolic, r.pulse)
+
+/** "When. Top x, bottom y, pulse z. Your blood pressure is high." (reference chart word, no advice) */
+fun spokenSummary(context: Context, takenAt: Long, sys: Int, dia: Int, pulse: Int): String {
+    val word = context.getString(when (com.goodbp.rules.BpCategory.of(sys, dia)) {
+        com.goodbp.rules.BpCategory.LOW -> R.string.say_cat_low
+        com.goodbp.rules.BpCategory.NORMAL -> R.string.say_cat_normal
+        com.goodbp.rules.BpCategory.PRE -> R.string.say_cat_pre
+        com.goodbp.rules.BpCategory.STAGE1, com.goodbp.rules.BpCategory.STAGE2 -> R.string.say_cat_high
+        com.goodbp.rules.BpCategory.CRISIS -> R.string.say_cat_crisis
+    })
+    return context.getString(R.string.say_summary, whenLabel(context, takenAt), sys, dia, pulse, word)
+}

@@ -120,4 +120,10 @@
     <string name="cat_stage2">High 2</string>
     <string name="cat_crisis">Very high</string>
     <string name="reference_note">Reference chart only, not a diagnosis.</string>
+    <string name="say_summary">%1$s. Top %2$d, bottom %3$d, pulse %4$d. Your blood pressure is %5$s.</string>
+    <string name="say_cat_low">low</string>
+    <string name="say_cat_normal">normal</string>
+    <string name="say_cat_pre">slightly high</string>
+    <string name="say_cat_high">high</string>
+    <string name="say_cat_crisis">very high</string>
 </resources>

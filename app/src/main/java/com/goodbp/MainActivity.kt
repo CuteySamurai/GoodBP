@@ -27,9 +27,7 @@ class MainActivity : ComponentActivity() {
 
     /** App language is set by the family, independent of the phone's language. */
     override fun attachBaseContext(base: Context) {
-        val tag = Settings(base).language.tag
-        val config = Configuration(base.resources.configuration).apply { setLocale(Locale.forLanguageTag(tag)) }
-        super.attachBaseContext(base.createConfigurationContext(config))
+        super.attachBaseContext(AppLocale.wrap(base))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +39,7 @@ class MainActivity : ComponentActivity() {
         val alerts = (application as GoodBpApp).alerts
         pendingStart = savedInstanceState == null && intent.getBooleanExtra(EXTRA_START_READING, false)
         setContent {
+          AppLanguage {
             GoodBpTheme {
                 val nav = rememberNavController()
                 NavHost(nav, startDestination = "main") {
@@ -62,6 +61,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+          }
         }
     }
 

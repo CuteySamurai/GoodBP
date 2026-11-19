@@ -43,7 +43,7 @@ object DoctorReport {
             y += 16f
         }
         doc.finishPage(page)
-        val out = File(context.cacheDir, "bp_report.pdf")
+        val out = ExportName.file(context, "pdf")
         out.outputStream().use { doc.writeTo(it) }
         doc.close()
         return out

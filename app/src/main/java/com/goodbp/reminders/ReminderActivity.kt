@@ -21,11 +21,16 @@ import kotlinx.coroutines.delay
  */
 class ReminderActivity : ComponentActivity() {
 
+    override fun attachBaseContext(base: android.content.Context) {
+        super.attachBaseContext(com.goodbp.AppLocale.wrap(base))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val isBp = intent.getStringExtra(ReminderScheduler.EXTRA_KIND) != ReminderScheduler.Kind.MED.name
         val speaker = Speaker(this, Settings(this).language)
         setContent {
+          com.goodbp.AppLanguage {
             GoodBpTheme {
                 val prompt = stringResource(if (isBp) R.string.say_reminder_bp else R.string.say_reminder_med)
                 val key = if (isBp) "say_reminder_bp" else "say_reminder_med"
@@ -45,6 +50,7 @@ class ReminderActivity : ComponentActivity() {
                     },
                 )
             }
+          }
         }
     }
 

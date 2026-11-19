@@ -123,4 +123,10 @@
     <string name="cat_stage2">高血压2级</string>
     <string name="cat_crisis">非常高</string>
     <string name="reference_note">仅供参考，不是诊断。</string>
+    <string name="say_summary">%1$s，高压 %2$d，低压 %3$d，心跳 %4$d。您的血压%5$s。</string>
+    <string name="say_cat_low">偏低</string>
+    <string name="say_cat_normal">正常</string>
+    <string name="say_cat_pre">稍微偏高</string>
+    <string name="say_cat_high">高</string>
+    <string name="say_cat_crisis">非常高</string>
 </resources>

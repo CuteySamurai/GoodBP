@@ -19,7 +19,7 @@ object CsvExport {
                 append("${fmt.format(Date(it.takenAt))},${it.systolic},${it.diastolic},${it.pulse},${it.result},${it.via}\n")
             }
         }
-        val file = File(context.cacheDir, "bp_readings.csv").apply { writeText("﻿" + text) } // BOM so Excel reads UTF-8
+        val file = ExportName.file(context, "csv").apply { writeText("﻿" + text) } // BOM so Excel reads UTF-8
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.files", file)
         val send = Intent(Intent.ACTION_SEND).setType("text/csv")
             .putExtra(Intent.EXTRA_STREAM, uri)

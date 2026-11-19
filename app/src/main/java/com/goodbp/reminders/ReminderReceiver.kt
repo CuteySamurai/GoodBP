@@ -12,7 +12,8 @@ import com.goodbp.R
 /** Alarm fired: show a full-screen reminder that speaks, then schedule tomorrow's. */
 class ReminderReceiver : BroadcastReceiver() {
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(raw: Context, intent: Intent) {
+        val context = com.goodbp.AppLocale.wrap(raw)
         val kind = ReminderScheduler.Kind.valueOf(intent.getStringExtra(ReminderScheduler.EXTRA_KIND) ?: "BP")
         val minutes = intent.getIntExtra(ReminderScheduler.EXTRA_MINUTES, 480)
         val medId = intent.getLongExtra(ReminderScheduler.EXTRA_MED_ID, 0)
