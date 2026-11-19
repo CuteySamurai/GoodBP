@@ -24,6 +24,10 @@ class SegmentReaderTest {
         assertEquals(Triple(92, 56, 72), SegmentReader.read(load("omron_92_56_72")))
     }
 
+    @Test fun guardianPhoto() {
+        assertEquals(Triple(160, 103, 84), SegmentReader.read(load("guardian_160_103_84")))
+    }
+
     @Test fun crookedPhotoStillReads() {
         assertEquals(Triple(92, 56, 72), SegmentReader.read(SegmentReader.rotate(load("omron_92_56_72"), 5.0)))
     }
