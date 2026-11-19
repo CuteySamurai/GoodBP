@@ -32,9 +32,12 @@ class SegmentReaderTest {
         assertEquals(Triple(92, 56, 72), SegmentReader.read(SegmentReader.rotate(load("omron_92_56_72"), 5.0)))
     }
 
-    /** Heavy shadow and glare: may not read yet, but must never give wrong numbers. */
-    @Test fun hardPhotoNeverWrong() {
-        val r = SegmentReader.read(load("guardian_161_110_80"))
-        assertTrue("got $r", r == null || r == Triple(161, 110, 80))
+    /** Heavy shadow or glare: may not read yet, but must never give wrong numbers. */
+    @Test fun hardPhotosNeverWrong() {
+        val a = SegmentReader.read(load("guardian_161_110_80"))
+        assertTrue("got $a", a == null || a == Triple(161, 110, 80))
+        // Colour bar gauge on the left once came out as 55/51/55.
+        val b = SegmentReader.read(load("guardian_glare_152_107_96"))
+        assertTrue("got $b", b == null || b == Triple(152, 107, 96))
     }
 }

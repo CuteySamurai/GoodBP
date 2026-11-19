@@ -18,7 +18,7 @@ android {
         targetSdk = 36
         // CI sets VERSION_CODE from the run number so every upload is higher.
         versionCode = (System.getenv("VERSION_CODE") ?: "1").toInt()
-        versionName = "0.5.1"
+        versionName = "0.5.2"
     }
 
     // Upload key comes from GitHub secrets (never committed). Without them, release stays unsigned.
@@ -69,7 +69,6 @@ dependencies {
     implementation("androidx.camera:camera-camera2:1.4.1")
     implementation("androidx.camera:camera-lifecycle:1.4.1")
     implementation("androidx.camera:camera-view:1.4.1")
-    implementation("com.google.mlkit:text-recognition:16.0.1")
 
     // History chart (wired up in the history step).
     implementation("com.patrykandpatrick.vico:compose-m3:2.0.0")

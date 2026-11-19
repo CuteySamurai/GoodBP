@@ -8,19 +8,16 @@ import android.media.ExifInterface
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 
 /**
- * Photo logging, all on the phone. First our own seven-segment reader ([SegmentReader]),
- * which reads any monitor that stacks SYS, DIA, PULSE top to bottom. If that fails,
- * ML Kit text recognition, then the optional cloud slot. Null means "type it in".
+ * Photo logging, all on the phone: our own seven-segment reader ([SegmentReader]),
+ * which reads any monitor that stacks SYS, DIA, PULSE top to bottom. Generic text OCR
+ * (ML Kit) was dropped: it misread LCD digits and labels into wrong numbers.
+ * Null means "type it in".
  * The numbers are always read back for a yes/no before saving.
  */
 class PhotoReader(context: Context, private val cloud: CloudReader? = null) {
 
-    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
     private val appContext = context.applicationContext
 
     /** What OCR saw last time (for the test log / debugging photo problems). */
@@ -32,7 +29,10 @@ class PhotoReader(context: Context, private val cloud: CloudReader? = null) {
     fun read(photo: Uri, onResult: (Triple<Int, Int, Int>?) -> Unit) {
         Thread {
             val seg = runCatching { loadGray(photo)?.let { SegmentReader.read(it) } }.getOrNull()
-            main.post { if (seg != null) { lastRawText = "segments: $seg"; onResult(seg) } else readWithMlKit(photo, onResult) }
+            main.post {
+                lastRawText = "segments: $seg"
+                if (seg != null || cloud == null) onResult(seg) else cloud.read(photo, onResult)
+            }
         }.start()
     }
 
@@ -71,24 +71,6 @@ class PhotoReader(context: Context, private val cloud: CloudReader? = null) {
             argb[i] = ((c shr 16 and 255) * 299 + (c shr 8 and 255) * 587 + (c and 255) * 114) / 1000
         }
         return SegmentReader.Gray(w, h, argb)
-    }
-
-    private fun readWithMlKit(photo: Uri, onResult: (Triple<Int, Int, Int>?) -> Unit) {
-        val image = runCatching { InputImage.fromFilePath(appContext, photo) }.getOrNull()
-            ?: return onResult(null)
-        recognizer.process(image)
-            .addOnSuccessListener { text ->
-                // Word-level pieces with their boxes, so we can keep the big digits in screen order.
-                val tokens = text.textBlocks.flatMap { b -> b.lines.flatMap { l -> l.elements } }.mapNotNull { e ->
-                    val box = e.boundingBox ?: return@mapNotNull null
-                    MonitorTextParser.Token(e.text, box.top, box.left, box.height())
-                }
-                val local = MonitorTextParser.parseTokens(tokens)
-                    ?: MonitorTextParser.parse(text.textBlocks.sortedBy { it.boundingBox?.top ?: 0 }.flatMap { it.lines.map { l -> l.text } })
-                lastRawText = text.text
-                if (local != null || cloud == null) onResult(local) else cloud.read(photo, onResult)
-            }
-            .addOnFailureListener { if (cloud == null) onResult(null) else cloud.read(photo, onResult) }
     }
 }
 

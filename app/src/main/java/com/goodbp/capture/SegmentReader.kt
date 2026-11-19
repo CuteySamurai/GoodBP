@@ -37,17 +37,18 @@ object SegmentReader {
 
     /**
      * Several ink levels and grouping distances: dim, shadowed or glared screens
-     * each suit a different one. Every setting votes; two agreeing votes win early.
+     * each suit a different one. Every setting votes; three agreeing settings are needed.
      */
     private fun readUpright(img: Gray): Triple<Int, Int, Int>? {
         val votes = LinkedHashMap<Triple<Int, Int, Int>, Int>()
         for (t in listOf(0.5, 0.4, 0.6, 0.3)) for (rf in listOf(0.5, 0.8)) {
             val r = pick(numbers(img, t, rf)) ?: continue
             val n = (votes[r] ?: 0) + 1
-            if (n >= 2) return r
+            if (n >= 3) return r
             votes[r] = n
         }
-        return votes.keys.firstOrNull()
+        // One or two votes are too shaky (glare can turn a 0 into a 3): better to ask.
+        return null
     }
 
     // ---------------------------------------------------------------- image prep
@@ -320,6 +321,8 @@ object SegmentReader {
         )
         var bits = 0
         segs.forEachIndexed { i, f -> if (f > 0.22) bits = bits or (1 shl i) }
+        // A segment that is neither clearly on nor clearly off (glare, blur) makes the digit unsure.
+        if (segs.any { it in 0.12..0.32 }) return bits to null
         return bits to patterns[bits]
     }
 
@@ -330,8 +333,12 @@ object SegmentReader {
     private fun readLines(img: Gray, ratio: Double, reachFactor: Double): List<List<Read>> {
         val m = darkMask(img, ratio)
         val w = img.w
+        val kept = blobs(m, w, img.h)
+        // Ink that survived the blob filters, for re-reading whole bands below.
+        val ink = BooleanArray(m.size)
+        for (b in kept) for (p in b.pix) ink[p] = true
         val all = ArrayList<Blob>()
-        for (c in cluster(blobs(m, w, img.h), reachFactor).filter { it.h >= 14 }) {
+        for (c in cluster(kept, reachFactor).filter { it.h >= 14 }) {
             val ls = lines(c, w)
             all.addAll(ls.filter { it.h >= 12 })
             // Digits without a middle bar (0, 1, 7) have a blank row halfway down,
@@ -343,12 +350,30 @@ object SegmentReader {
                     all.add(Blob(min(a.x0, b.x0), a.y0, max(a.x1, b.x1), b.y1, a.pix + b.pix))
             }
         }
-        return all.map { line ->
+        fun read(line: Blob): List<Read> {
             val sh = shearOf(line, w)
-            glyphs(line, w, sh)
+            return glyphs(line, w, sh)
                 .filter { it.h >= 0.6 * line.h && it.pix.size >= 10 }
-                .map { g -> val (bits, d) = decodeBits(g, w, sh); Read(g, bits, d) }
+                .map { g ->
+                    val (bits, d) = decodeBits(g, w, sh)
+                    // Real digits other than 1 are wide; thin bars (charge or level gauges) are not.
+                    Read(g, bits, if (d != null && d != 1 && g.w < 0.4 * g.h) null else d)
+                }
         }
+        val first = all.map { read(it) }
+        // A digit's strokes can land in different clusters or line halves (a "7"
+        // whose lower stroke stands apart). Re-read the full band of ink at the
+        // height of every tall glyph found so far.
+        val seen = HashSet<Long>()
+        val second = first.flatten().filter { it.g.h >= 24 }.mapNotNull { r ->
+            val g = r.g
+            if (!seen.add((g.y0 / 3).toLong() * 100000 + g.y1 / 3)) return@mapNotNull null
+            val x0 = max(0, g.x0 - 3 * g.h); val x1 = min(w - 1, g.x1 + 3 * g.h)
+            val pix = ArrayList<Int>()
+            for (y in g.y0..g.y1) for (x in x0..x1) if (ink[y * w + x]) pix.add(y * w + x)
+            read(blobOf(pix.toIntArray(), w))
+        }
+        return first + second
     }
 
     fun numbers(img: Gray, ratio: Double = 0.5, reachFactor: Double = 0.5): List<Num> {
@@ -357,34 +382,57 @@ object SegmentReader {
         val reads = readLines(img, ratio, reachFactor).flatten().filter { it.digit != null }.sortedBy { it.g.x0 }
         val chains = ArrayList<MutableList<Read>>()
         for (r in reads) {
-            val cy = (r.g.y0 + r.g.y1) / 2.0
             val chain = chains.filter { c ->
                 val last = c.last().g; val h = last.h.toDouble()
-                abs(cy - (last.y0 + last.y1) / 2.0) < 0.2 * h && r.g.h / h in 0.85..1.18 &&
+                // Same top line (a "7" may end higher than its neighbours), similar size, close.
+                abs(r.g.y0 - last.y0) < 0.15 * h && r.g.h / h in 0.75..1.33 &&
                     r.g.x0 - last.x1 in (-0.1 * h).toInt()..(0.9 * h).toInt()
-            }.minByOrNull { c -> abs(cy - (c.last().g.y0 + c.last().g.y1) / 2.0) }
+            }.minByOrNull { c -> abs(r.g.y0 - c.last().g.y0) }
             if (chain != null) chain.add(r) else chains.add(arrayListOf(r))
         }
-        return chains.filter { it.size in 2..3 }.mapNotNull { run ->
+        // Digits sit on a fixed pitch (right edges evenly spaced). Bars or marks
+        // next to a number break that rhythm: cut there. Numbers are right-aligned,
+        // so a longer run keeps its last 3 digits.
+        val runs = ArrayList<List<Read>>()
+        for (c in chains) {
+            if (c.size < 3) { runs.add(c); continue }
+            val steps = (1 until c.size).map { c[it].g.x1 - c[it - 1].g.x1 }
+            val pitch = steps.sorted()[steps.size / 2].toDouble()
+            var cur = arrayListOf(c[0])
+            for (i in 1 until c.size) {
+                if (steps[i - 1] / pitch !in 0.7..1.3) { runs.add(cur); cur = arrayListOf() }
+                cur.add(c[i])
+            }
+            runs.add(cur)
+        }
+        return runs.map { if (it.size > 3) it.takeLast(3) else it }.filter { it.size in 2..3 }.mapNotNull { run ->
             val v = run.fold(0) { acc, r -> acc * 10 + r.digit!! }
-            if (run.size == 2 && run[0].digit != 0 || run.size == 3 && v in 100..299)
+            // All-"1" rows are usually bars or gauge marks, not numbers.
+            if (run.all { it.digit == 1 }) null
+            else if (run.size == 2 && run[0].digit != 0 || run.size == 3 && v in 100..299)
                 Num(v, run.size, run.minOf { it.g.x0 }, run.minOf { it.g.y0 }, run.maxOf { it.g.x1 }, run.maxOf { it.g.y1 })
             else null
         }
     }
 
-    /** SYS and DIA are the two biggest rows, DIA under SYS; PULSE is the next row under DIA. */
+    /**
+     * SYS and DIA: two rows of the same size, DIA right under SYS, right edges lined up.
+     * PULSE: the next row under DIA, not bigger than it, right edge lined up too.
+     * Among candidates the biggest digits win (the main readout of the screen).
+     */
     fun pick(nums: List<Num>): Triple<Int, Int, Int>? {
         fun overlapsX(a: Num, b: Num) = min(a.right, b.right) - max(a.left, b.left) > 0.3 * min(a.right - a.left, b.right - b.left)
         var best: Triple<Int, Int, Int>? = null; var bestScore = -1
         for (s in nums) for (d in nums) {
             if (s === d || d.top < s.bottom - 0.2 * s.height) continue
-            if (d.height.toDouble() / s.height !in 0.8..1.25 || !overlapsX(s, d)) continue
-            if (d.top - s.bottom > 0.8 * s.height) continue
-            if (s.value !in 50..260 || d.value !in 30..180 || s.value <= d.value) continue
+            if (d.height.toDouble() / s.height !in 0.85..1.18 || !overlapsX(s, d)) continue
+            if (d.top - s.bottom > 0.6 * s.height) continue
+            if (abs(d.right - s.right) > 0.35 * s.height) continue
+            if (s.value !in 60..260 || d.value !in 30..160 || s.value <= d.value) continue
             val p = nums.filter {
-                it !== s && it !== d && it.top >= d.bottom - 0.2 * d.height && it.top - d.bottom < 1.2 * d.height &&
-                    it.height.toDouble() / d.height in 0.3..1.15 && overlapsX(it, d) && it.value in 30..220
+                it !== s && it !== d && it.top >= d.bottom - 0.15 * d.height && it.top - d.bottom < 1.0 * d.height &&
+                    it.height.toDouble() / d.height in 0.3..1.05 && abs(it.right - d.right) < 0.5 * d.height &&
+                    it.value in 30..220
             }.minByOrNull { it.top } ?: continue
             val score = s.height + d.height
             if (score > bestScore) { bestScore = score; best = Triple(s.value, d.value, p.value) }
