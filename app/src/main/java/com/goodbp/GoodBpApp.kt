@@ -12,6 +12,6 @@ class GoodBpApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        ReminderScheduler.scheduleBp(this, Settings(this).bpTimes)
+        Settings(this).let { if (it.remindersOn) ReminderScheduler.scheduleBp(this, it.bpTimes) }
     }
 }

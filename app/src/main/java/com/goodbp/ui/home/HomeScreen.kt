@@ -27,37 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.goodbp.R
 
-/**
- * Feature 6: one big button, no menus. Family settings are behind a long-press on
- * the small corner area so she can't wander into them.
- */
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun HomeScreen(onStart: () -> Unit, onHistory: () -> Unit, onFamilyLongPress: () -> Unit) {
-    Box(Modifier.fillMaxSize()) {
-        BigButtonScreen(
-            label = stringResource(R.string.home_button), onPress = onStart,
-            secondaryLabel = "📋  " + stringResource(R.string.history), onSecondary = onHistory,
-        )
-        val context = androidx.compose.ui.platform.LocalContext.current
-        val hint = stringResource(R.string.hold_for_family)
-        Box(
-            Modifier
-                .align(Alignment.TopEnd)
-                .padding(8.dp)
-                .size(64.dp)
-                .combinedClickable(
-                    onClick = { android.widget.Toast.makeText(context, hint, android.widget.Toast.LENGTH_SHORT).show() },
-                    onLongClick = onFamilyLongPress,
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            // Small, grey gear: visible to family, but a tap alone does nothing for her.
-            Text("⚙", fontSize = 28.sp, color = Color.LightGray)
-        }
-    }
-}
-
+/** Single big button screen, used by the full-screen reminder. */
 @Composable
 fun BigButtonScreen(
     label: String,

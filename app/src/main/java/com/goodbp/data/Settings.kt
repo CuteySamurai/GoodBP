@@ -16,6 +16,19 @@ class Settings(context: Context) {
         get() = p.getInt("age", 75)
         set(v) = p.edit().putInt("age", v).apply()
 
+    var name: String
+        get() = p.getString("name", "")!!
+        set(v) = p.edit().putString("name", v).apply()
+
+    /** Body weight in kg; 0 = not set. */
+    var weightKg: Float
+        get() = p.getFloat("weight", 0f)
+        set(v) = p.edit().putFloat("weight", v).apply()
+
+    var remindersOn: Boolean
+        get() = p.getBoolean("reminders_on", true)
+        set(v) = p.edit().putBoolean("reminders_on", v).apply()
+
     /** Reminder times as minutes after midnight, e.g. 8:00 -> 480. */
     var bpTimes: List<Int>
         get() = p.getString("bp_times", "480,780,1200")!!.split(",").mapNotNull { it.toIntOrNull() }

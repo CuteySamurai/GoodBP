@@ -51,21 +51,22 @@ class CoreLogicTest {
         assertEquals(FlowState.ReadBack(85, 55, 70, Via.PHOTO), f.state)
         assertTrue(saved.isEmpty())
         f.confirm(false)
-        assertEquals(FlowState.SpeakNumbers(1), f.state)
+        assertEquals(FlowState.ManualEntry(prefill = Triple(85, 55, 70)), f.state)
         assertTrue(saved.isEmpty())
-        f.voiceHeard(Triple(86, 56, 71))
+        f.manualEntered(Triple(86, 56, 71))
+        assertEquals(FlowState.ReadBack(86, 56, 71, Via.MANUAL), f.state)
         f.confirm(true)
         assertEquals(listOf(BpResult.LOW), saved)
         assertTrue(f.state is FlowState.Result)
     }
 
-    @Test fun flowFailedPhotoGoesToVoiceThenFamily() {
-        val f = ReadingFlow(range, maxVoiceAttempts = 3) { _, _, _, _, _ -> }
+    @Test fun failedPhotoGoesToManualAndBadNumbersStay() {
+        val f = ReadingFlow(range) { _, _, _, _, _ -> }
         f.photoRead(null)
-        assertEquals(FlowState.SpeakNumbers(1), f.state)
-        f.voiceHeard(null); f.voiceHeard(Triple(80, 120, 70)) // implausible counts as a fail
-        assertEquals(FlowState.SpeakNumbers(3), f.state)
-        f.voiceHeard(null)
-        assertEquals(FlowState.HandOffToFamily, f.state)
+        assertEquals(FlowState.ManualEntry(), f.state)
+        f.manualEntered(Triple(80, 120, 70)) // dia > sys: implausible
+        assertEquals(FlowState.ManualEntry(prefill = Triple(80, 120, 70), invalid = true), f.state)
+        val m = ReadingFlow(range, start = FlowState.ManualEntry()) { _, _, _, _, _ -> }
+        assertEquals(FlowState.ManualEntry(), m.state)
     }
 }

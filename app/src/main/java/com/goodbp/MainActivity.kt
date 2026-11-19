@@ -13,11 +13,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.LaunchedEffect
 import com.goodbp.data.Settings
-import com.goodbp.setup.FamilySetupScreen
 import com.goodbp.ui.flow.ReadingScreen
-import com.goodbp.ui.history.ElderHistoryScreen
-import com.goodbp.ui.history.HistoryScreen
-import com.goodbp.ui.home.HomeScreen
+import com.goodbp.ui.main.MainScaffold
 import com.goodbp.ui.theme.GoodBpTheme
 import java.util.Locale
 
@@ -44,19 +41,19 @@ class MainActivity : ComponentActivity() {
         setContent {
             GoodBpTheme {
                 val nav = rememberNavController()
-                NavHost(nav, startDestination = "home") {
-                    composable("home") {
-                        LaunchedEffect(Unit) { if (pendingStart) { pendingStart = false; nav.navigate("reading") } }
-                        HomeScreen(
-                            onStart = { nav.navigate("reading") },
-                            onHistory = { nav.navigate("my_history") },
-                            onFamilyLongPress = { nav.navigate("family") },
+                NavHost(nav, startDestination = "main") {
+                    composable("main") {
+                        LaunchedEffect(Unit) { if (pendingStart) { pendingStart = false; nav.navigate("reading/photo") } }
+                        MainScaffold(
+                            onPhoto = { nav.navigate("reading/photo") },
+                            onManual = { nav.navigate("reading/manual") },
+                            onLanguageChanged = { recreate() },
                         )
                     }
-                    composable("reading") { ReadingScreen(alerts, onFinished = { nav.popBackStack("home", false) }) }
-                    composable("family") { FamilySetupScreen(onHistory = { nav.navigate("history") }, onLanguageChanged = { recreate() }) }
-                    composable("history") { HistoryScreen() }
-                    composable("my_history") { ElderHistoryScreen(onBack = { nav.popBackStack() }) }
+                    composable("reading/{mode}") { entry ->
+                        ReadingScreen(alerts, startManual = entry.arguments?.getString("mode") == "manual",
+                            onFinished = { nav.popBackStack("main", false) })
+                    }
                 }
             }
         }

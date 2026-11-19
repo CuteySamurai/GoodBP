@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ReadingDao {
     @Insert suspend fun insert(r: Reading): Long
+    @Query("DELETE FROM readings WHERE id = :id") suspend fun delete(id: Long)
     @Query("SELECT * FROM readings ORDER BY takenAt DESC")
     fun all(): Flow<List<Reading>>
     @Query("SELECT * FROM readings WHERE takenAt >= :since ORDER BY takenAt")

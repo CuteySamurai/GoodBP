@@ -6,36 +6,35 @@ import com.goodbp.rules.BpRules
 
 /**
  * The core loop as a plain state machine (no Android), so it can be unit tested:
- *   Photo -> (fail) Voice -> ReadBack -> yes: Result (saved) / no: back to Voice
- * Nothing is saved until she says 对 at read-back. That is a safety rule.
+ *   Photo --(fail)--> Manual entry --> ReadBack --yes--> Result (saved)
+ *                                         \--no--> Manual entry (numbers pre-filled)
+ * Nothing is saved until she confirms at read-back. That is a safety rule.
  */
 sealed interface FlowState {
     data object TakePhoto : FlowState
-    data class SpeakNumbers(val attempt: Int) : FlowState
+    data class ManualEntry(val prefill: Triple<Int, Int, Int>? = null, val invalid: Boolean = false) : FlowState
     data class ReadBack(val sys: Int, val dia: Int, val pulse: Int, val via: Via) : FlowState
     data class Result(val sys: Int, val dia: Int, val pulse: Int, val result: BpResult) : FlowState
-    data object HandOffToFamily : FlowState
 }
 
-enum class Via { PHOTO, VOICE }
+enum class Via { PHOTO, MANUAL }
 
 class ReadingFlow(
     private val range: BpRange,
-    private val maxVoiceAttempts: Int = 3,
+    start: FlowState = FlowState.TakePhoto,
     private val onConfirmedSave: (sys: Int, dia: Int, pulse: Int, via: Via, result: BpResult) -> Unit,
 ) {
-    var state: FlowState = FlowState.TakePhoto
+    var state: FlowState = start
         private set
 
     fun photoRead(reading: Triple<Int, Int, Int>?) {
-        state = accept(reading, Via.PHOTO) ?: FlowState.SpeakNumbers(attempt = 1)
+        state = accept(reading, Via.PHOTO) ?: FlowState.ManualEntry()
     }
 
-    fun skipPhoto() { state = FlowState.SpeakNumbers(attempt = 1) }
+    fun skipPhoto() { state = FlowState.ManualEntry() }
 
-    fun voiceHeard(reading: Triple<Int, Int, Int>?) {
-        val s = state as? FlowState.SpeakNumbers ?: return
-        state = accept(reading, Via.VOICE) ?: nextVoiceAttempt(s.attempt)
+    fun manualEntered(reading: Triple<Int, Int, Int>) {
+        state = accept(reading, Via.MANUAL) ?: FlowState.ManualEntry(prefill = reading, invalid = true)
     }
 
     fun confirm(yes: Boolean) {
@@ -45,14 +44,11 @@ class ReadingFlow(
             onConfirmedSave(s.sys, s.dia, s.pulse, s.via, r)
             FlowState.Result(s.sys, s.dia, s.pulse, r)
         } else {
-            FlowState.SpeakNumbers(attempt = 1)
+            FlowState.ManualEntry(prefill = Triple(s.sys, s.dia, s.pulse))
         }
     }
 
     private fun accept(r: Triple<Int, Int, Int>?, via: Via): FlowState? =
         r?.takeIf { BpRules.isPlausible(it.first, it.second, it.third) }
             ?.let { FlowState.ReadBack(it.first, it.second, it.third, via) }
-
-    private fun nextVoiceAttempt(attempt: Int): FlowState =
-        if (attempt >= maxVoiceAttempts) FlowState.HandOffToFamily else FlowState.SpeakNumbers(attempt + 1)
 }

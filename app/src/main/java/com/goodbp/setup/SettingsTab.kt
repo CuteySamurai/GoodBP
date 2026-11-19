@@ -17,6 +17,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
@@ -27,6 +28,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,22 +46,58 @@ import com.goodbp.rules.BpRange
 import com.goodbp.speech.Speaker
 import kotlinx.coroutines.delay
 
-/** Family-only setup (long-press top-right corner of home). Normal-size text: it's for the caregiver. */
+/** Settings tab: profile, reminders, export, language, voice, BP range, phone setup. */
 @Composable
-fun FamilySetupScreen(onHistory: () -> Unit, onLanguageChanged: () -> Unit) {
+fun SettingsTab(onLanguageChanged: () -> Unit) {
     val context = LocalContext.current
     val settings = remember { Settings(context) }
     Column(
         Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text(stringResource(R.string.family_settings), style = MaterialTheme.typography.headlineLarge)
-        Button(onHistory, Modifier.fillMaxWidth()) { Text(stringResource(R.string.history_and_chart), fontSize = 20.sp) }
+        Text(stringResource(R.string.tab_settings), style = MaterialTheme.typography.headlineLarge)
+        ProfileSection(settings)
+        AlarmSection(settings)
+        ExportSection()
         LanguageSection(settings, onLanguageChanged)
         VoiceSection(settings)
-        AlarmSection(settings)
         RangeSection(settings)
         PhoneSetupSection()
+    }
+}
+
+@Composable
+private fun ProfileSection(settings: Settings) = Section(stringResource(R.string.profile)) {
+    var name by remember { mutableStateOf(settings.name) }
+    var age by remember { mutableStateOf(settings.age.toString()) }
+    var weight by remember { mutableStateOf(if (settings.weightKg > 0) "%.1f".format(settings.weightKg) else "") }
+    var saved by remember { mutableStateOf(false) }
+    OutlinedTextField(name, { name = it; saved = false }, Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.name)) }, singleLine = true)
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        OutlinedTextField(age, { age = it.filter(Char::isDigit).take(3); saved = false }, Modifier.weight(1f),
+            label = { Text(stringResource(R.string.age)) }, singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+        OutlinedTextField(weight, { weight = it.filter { c -> c.isDigit() || c == '.' }.take(5); saved = false }, Modifier.weight(1f),
+            label = { Text(stringResource(R.string.weight_kg)) }, singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal))
+    }
+    Button({
+        settings.name = name.trim()
+        age.toIntOrNull()?.let { settings.age = it }
+        settings.weightKg = weight.toFloatOrNull() ?: 0f
+        saved = true
+    }, Modifier.fillMaxWidth()) { Text(stringResource(if (saved) R.string.saved else R.string.save)) }
+}
+
+@Composable
+private fun ExportSection() = Section(stringResource(R.string.export)) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val dao = remember { com.goodbp.data.GoodBpDatabase.get(context).readings() }
+    Text(stringResource(R.string.export_help), fontSize = Small)
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Button({ scope.launch { com.goodbp.report.DoctorReport.share(context, dao.since(0)) } }, Modifier.weight(1f)) { Text("PDF") }
+        OutlinedButton({ scope.launch { com.goodbp.report.CsvExport.share(context, dao.since(0)) } }, Modifier.weight(1f)) { Text("CSV (Excel)") }
     }
 }
 
@@ -114,11 +153,19 @@ private fun AlarmSection(settings: Settings) = Section(stringResource(R.string.r
 
     fun save(new: List<Int>) {
         val clean = new.distinct().sorted()
-        ReminderScheduler.replaceBp(context, settings.bpTimes, clean)
+        ReminderScheduler.replaceBp(context, settings.bpTimes, if (settings.remindersOn) clean else emptyList())
         settings.bpTimes = clean
         times = clean
     }
 
+    var on by remember { mutableStateOf(settings.remindersOn) }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(stringResource(R.string.reminders_on), fontSize = 20.sp, modifier = Modifier.weight(1f))
+        Switch(on, {
+            on = it; settings.remindersOn = it
+            if (it) ReminderScheduler.scheduleBp(context, times) else ReminderScheduler.replaceBp(context, times, emptyList())
+        })
+    }
     if (times.isEmpty()) Text(stringResource(R.string.no_reminders), fontSize = Small)
     times.forEach { m ->
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {

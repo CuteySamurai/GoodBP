@@ -8,7 +8,7 @@ import com.goodbp.data.Settings
 /** Alarms are cleared on reboot and app update, so set them again. */
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        ReminderScheduler.scheduleBp(context, Settings(context).bpTimes)
+        Settings(context).let { if (it.remindersOn) ReminderScheduler.scheduleBp(context, it.bpTimes) }
         // TODO (meds step): reschedule medicine reminders too.
     }
 }
