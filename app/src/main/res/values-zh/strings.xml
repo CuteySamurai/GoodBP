@@ -19,7 +19,7 @@
     <!-- Spoken prompts (TTS fallback until recorded clips exist in res/raw) -->
     <string name="say_reminder_bp">该量血压了。</string>
     <string name="say_reminder_med">该吃药了。</string>
-    <string name="say_take_photo">请把血压计屏幕拍下来。</string>
+    <string name="say_take_photo">请把血压计屏幕拍下来。屏幕上不要有阴影或反光。</string>
     <string name="say_speak_numbers">请说三个数字：高压，低压，心跳。</string>
     <string name="say_readback">高压 %1$d，低压 %2$d，心跳 %3$d。对不对？</string>
     <string name="say_retry">好，我们再来一次。</string>
@@ -115,7 +115,7 @@
     <string name="setup_steps">如果按钮打不开对的页面，请手动：\n• 设置 → 应用 → 本app → 电池 → 不限制 / 允许后台运行\n• 设置 → 应用 → 本app → 自动启动 → 开启（Oppo、Xiaomi、Vivo、Huawei 等）\n• 最近任务里把本app“锁住”\n• 通知：允许、锁屏显示、悬浮通知</string>
     <string name="yes_mark">是 ✓</string>
     <string name="no_mark">否 ✗</string>
-    <string name="photo_unreadable">照片看不清楚，请手动输入。</string>
+    <string name="photo_unreadable">照片看不清楚。请避开阴影或反光再拍一次，或手动输入。</string>
     <string name="cat_low">偏低</string>
     <string name="cat_normal">正常</string>
     <string name="cat_pre">偏高前期</string>
@@ -129,4 +129,5 @@
     <string name="say_cat_pre">稍微偏高</string>
     <string name="say_cat_high">高</string>
     <string name="say_cat_crisis">非常高</string>
+    <string name="photo_tip">提示：屏幕上不要有阴影或反光，手机拿正，让数字清楚。</string>
 </resources>

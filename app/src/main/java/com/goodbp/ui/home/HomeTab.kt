@@ -80,6 +80,8 @@ fun HomeTab(onPhoto: () -> Unit, onManual: () -> Unit) {
             }
         }
 
+        Text("💡 " + stringResource(R.string.photo_tip), fontSize = 16.sp, color = Color(0xFF616161))
+
         val earlier = readings.drop(1).take(3)
         if (earlier.isNotEmpty()) {
             Text(stringResource(R.string.recent), fontSize = 22.sp, fontWeight = FontWeight.Bold)

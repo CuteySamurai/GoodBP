@@ -18,7 +18,7 @@ android {
         targetSdk = 36
         // CI sets VERSION_CODE from the run number so every upload is higher.
         versionCode = (System.getenv("VERSION_CODE") ?: "1").toInt()
-        versionName = "0.5.3"
+        versionName = "0.5.4"
     }
 
     // Upload key comes from GitHub secrets (never committed). Without them, release stays unsigned.

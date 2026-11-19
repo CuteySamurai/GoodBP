@@ -17,7 +17,7 @@
     <string name="reminder_channel">Reminders</string>
     <string name="say_reminder_bp">Time to check your blood pressure.</string>
     <string name="say_reminder_med">Time for your medicine.</string>
-    <string name="say_take_photo">Please take a photo of the monitor screen.</string>
+    <string name="say_take_photo">Please take a photo of the monitor screen. Avoid shadows and light reflections on the screen.</string>
     <string name="say_speak_numbers">Please say three numbers: top, bottom, pulse.</string>
     <string name="say_readback">Top %1$d, bottom %2$d, pulse %3$d. Is that right?</string>
     <string name="say_retry">Okay, let\'s try again.</string>
@@ -112,7 +112,7 @@
     <string name="setup_steps">If a button doesn\'t open the right page, do it by hand:\n• Settings → Apps → this app → Battery → Unrestricted / Allow background\n• Settings → Apps → this app → Auto-start → On (Oppo, Xiaomi, Vivo, Huawei…)\n• Lock this app in the recent-apps screen\n• Notifications: allow, show on lock screen, pop-up</string>
     <string name="yes_mark">Yes ✓</string>
     <string name="no_mark">No ✗</string>
-    <string name="photo_unreadable">Couldn\'t read the photo. Please type the numbers.</string>
+    <string name="photo_unreadable">Couldn\'t read the photo. Try again without shadow or glare, or type the numbers.</string>
     <string name="cat_low">Low</string>
     <string name="cat_normal">Normal</string>
     <string name="cat_pre">Pre-high</string>
@@ -126,4 +126,5 @@
     <string name="say_cat_pre">slightly high</string>
     <string name="say_cat_high">high</string>
     <string name="say_cat_crisis">very high</string>
+    <string name="photo_tip">Tip: no shadow or glare on the screen. Hold the phone straight so all numbers are clear.</string>
 </resources>

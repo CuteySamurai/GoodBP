@@ -75,7 +75,12 @@ fun ReadingScreen(alerts: FamilyAlerts, startManual: Boolean, onFinished: () -> 
     val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
         if (ok) { reading = true; photoReader.read(photoUri) { reading = false; flow.photoRead(it); sync() } }
     }
-    fun openCamera() = runCatching { camera.launch(photoUri) }.onFailure { flow.skipPhoto(); sync() }
+    val sTakePhoto = stringResource(R.string.say_take_photo)
+    fun openCamera() {
+        // Spoken tip (she may not read): no shadow, no glare.
+        speaker.sayPrompt("say_take_photo", sTakePhoto)
+        runCatching { camera.launch(photoUri) }.onFailure { flow.skipPhoto(); sync() }
+    }
     // Photo mode opens the camera straight away (once).
     var autoOpened by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) { if (!startManual && !autoOpened) { autoOpened = true; openCamera() } }
@@ -101,6 +106,7 @@ fun ReadingScreen(alerts: FamilyAlerts, startManual: Boolean, onFinished: () -> 
                     if (reading) Text(stringResource(R.string.reading_photo), fontSize = 32.sp)
                     else {
                         Big("📷  " + stringResource(R.string.take_photo)) { openCamera() }
+                        Text("💡 " + stringResource(R.string.photo_tip), fontSize = 18.sp, color = Color(0xFF616161))
                         Big("✏️  " + stringResource(R.string.manual), Color(0xFF455A64)) { flow.skipPhoto(); sync() }
                         Big(stringResource(R.string.back), Color(0xFFBDBDBD), height = 80) { onFinished() }
                     }

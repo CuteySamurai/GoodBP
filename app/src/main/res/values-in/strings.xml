@@ -18,7 +18,7 @@
     <string name="reminder_channel">Pengingat</string>
     <string name="say_reminder_bp">Waktunya cek tekanan darah.</string>
     <string name="say_reminder_med">Waktunya minum obat.</string>
-    <string name="say_take_photo">Silakan foto layar alat tensi.</string>
+    <string name="say_take_photo">Silakan foto layar alat tensi. Hindari bayangan dan pantulan cahaya di layar.</string>
     <string name="say_speak_numbers">Silakan sebutkan tiga angka: atas, bawah, nadi.</string>
     <string name="say_readback">Atas %1$d, bawah %2$d, nadi %3$d. Benar?</string>
     <string name="say_retry">Baik, kita coba lagi.</string>
@@ -113,7 +113,7 @@
     <string name="setup_steps">Jika tombol tidak membuka halaman yang benar, lakukan manual:\n• Pengaturan → Aplikasi → aplikasi ini → Baterai → Tidak dibatasi\n• Pengaturan → Aplikasi → aplikasi ini → Mulai otomatis → Aktif (Oppo, Xiaomi, Vivo, Huawei…)\n• Kunci aplikasi ini di layar aplikasi terbaru\n• Notifikasi: izinkan, tampilkan di layar kunci, pop-up</string>
     <string name="yes_mark">Ya ✓</string>
     <string name="no_mark">Tidak ✗</string>
-    <string name="photo_unreadable">Foto tidak terbaca. Silakan ketik angkanya.</string>
+    <string name="photo_unreadable">Foto tidak terbaca. Coba lagi tanpa bayangan atau silau, atau ketik angkanya.</string>
     <string name="cat_low">Rendah</string>
     <string name="cat_normal">Normal</string>
     <string name="cat_pre">Pra-tinggi</string>
@@ -127,4 +127,5 @@
     <string name="say_cat_pre">agak tinggi</string>
     <string name="say_cat_high">tinggi</string>
     <string name="say_cat_crisis">sangat tinggi</string>
+    <string name="photo_tip">Tips: jangan ada bayangan atau silau di layar. Pegang ponsel lurus agar semua angka jelas.</string>
 </resources>
