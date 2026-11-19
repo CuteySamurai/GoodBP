@@ -16,14 +16,23 @@ class PhotoReader(context: Context, private val cloud: CloudReader? = null) {
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
     private val appContext = context.applicationContext
 
+    /** What OCR saw last time (for the test log / debugging photo problems). */
+    var lastRawText: String = ""
+        private set
+
     fun read(photo: Uri, onResult: (Triple<Int, Int, Int>?) -> Unit) {
         val image = runCatching { InputImage.fromFilePath(appContext, photo) }.getOrNull()
             ?: return onResult(null)
         recognizer.process(image)
             .addOnSuccessListener { text ->
-                // Sort blocks top-to-bottom so SYS, DIA, PULSE come out in order.
-                val lines = text.textBlocks.sortedBy { it.boundingBox?.top ?: 0 }.map { it.text }
-                val local = MonitorTextParser.parse(lines)
+                // Word-level pieces with their boxes, so we can keep the big digits in screen order.
+                val tokens = text.textBlocks.flatMap { b -> b.lines.flatMap { l -> l.elements } }.mapNotNull { e ->
+                    val box = e.boundingBox ?: return@mapNotNull null
+                    MonitorTextParser.Token(e.text, box.top, box.left, box.height())
+                }
+                val local = MonitorTextParser.parseTokens(tokens)
+                    ?: MonitorTextParser.parse(text.textBlocks.sortedBy { it.boundingBox?.top ?: 0 }.flatMap { it.lines.map { l -> l.text } })
+                lastRawText = text.text
                 if (local != null || cloud == null) onResult(local) else cloud.read(photo, onResult)
             }
             .addOnFailureListener { if (cloud == null) onResult(null) else cloud.read(photo, onResult) }

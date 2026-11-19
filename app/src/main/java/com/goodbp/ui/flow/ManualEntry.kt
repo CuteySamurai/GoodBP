@@ -43,6 +43,7 @@ import com.goodbp.ui.trend.SysColor
 fun ManualEntry(
     prefill: Triple<Int, Int, Int>?,
     invalid: Boolean,
+    photoFailed: Boolean = false,
     onDone: (Triple<Int, Int, Int>) -> Unit,
     onCancel: () -> Unit,
 ) {
@@ -64,7 +65,8 @@ fun ManualEntry(
     }
 
     Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        if (invalid) Text(stringResource(R.string.check_numbers), color = MaterialTheme.colorScheme.error, fontSize = 20.sp)
+        if (photoFailed && prefill == null) Text(stringResource(R.string.photo_unreadable), color = MaterialTheme.colorScheme.error, fontSize = 20.sp)
+        if (invalid || (photoFailed && prefill != null)) Text(stringResource(R.string.check_numbers), color = MaterialTheme.colorScheme.error, fontSize = 20.sp)
         rows.forEachIndexed { i, (meta, unit) ->
             val (code, name, color) = meta
             Row(

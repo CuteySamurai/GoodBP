@@ -15,7 +15,7 @@ android {
         targetSdk = 36
         // CI sets VERSION_CODE from the run number so every upload is higher.
         versionCode = (System.getenv("VERSION_CODE") ?: "1").toInt()
-        versionName = "0.4.0"
+        versionName = "0.4.1"
     }
 
     // Upload key comes from GitHub secrets (never committed). Without them, release stays unsigned.
@@ -53,6 +53,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.5")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.ui:ui-tooling-preview")
     debugImplementation("androidx.compose.ui:ui-tooling")
 

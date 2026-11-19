@@ -132,8 +132,6 @@ private fun LanguageSection(settings: Settings, onChanged: () -> Unit) =
                     label = { Text(names.getValue(lang)) })
             }
         }
-        if (settings.language == AppLanguage.ID)
-            Text(stringResource(R.string.id_partial), fontSize = Small)
     }
 
 @Composable
@@ -238,8 +236,11 @@ private fun NumField(label: String, v: String, set: (String) -> Unit, m: Modifie
 @Composable
 private fun PhoneSetupSection() = Section(stringResource(R.string.phone_setup)) {
     val context = LocalContext.current
-    Text("Battery optimisation off: ${OemSetupGuide.isIgnoringBatteryOptimizations(context)}", fontSize = 14.sp)
-    Button({ OemSetupGuide.requestIgnoreBatteryOptimizations(context) }, Modifier.fillMaxWidth()) { Text("1. 电池：不优化") }
-    Button({ OemSetupGuide.openAutoStartSettings(context) }, Modifier.fillMaxWidth()) { Text("2. 允许自动启动") }
-    Text(OemSetupGuide.MANUAL_STEPS_ZH, fontSize = Small)
+    Text(stringResource(R.string.setup_intro), fontSize = Small)
+    val ok = OemSetupGuide.isIgnoringBatteryOptimizations(context)
+    Text(stringResource(R.string.setup_battery_status, stringResource(if (ok) R.string.yes_mark else R.string.no_mark)), fontSize = Small)
+    Button({ OemSetupGuide.requestIgnoreBatteryOptimizations(context) }, Modifier.fillMaxWidth()) { Text(stringResource(R.string.setup_battery_btn)) }
+    Button({ OemSetupGuide.openAutoStartSettings(context) }, Modifier.fillMaxWidth()) { Text(stringResource(R.string.setup_autostart_btn)) }
+    Button({ OemSetupGuide.openNotificationSettings(context) }, Modifier.fillMaxWidth()) { Text(stringResource(R.string.setup_notif_btn)) }
+    Text(stringResource(R.string.setup_steps), fontSize = 15.sp)
 }

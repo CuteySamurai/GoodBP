@@ -12,7 +12,11 @@ import com.goodbp.rules.BpRules
  */
 sealed interface FlowState {
     data object TakePhoto : FlowState
-    data class ManualEntry(val prefill: Triple<Int, Int, Int>? = null, val invalid: Boolean = false) : FlowState
+    data class ManualEntry(
+        val prefill: Triple<Int, Int, Int>? = null,
+        val invalid: Boolean = false,
+        val photoFailed: Boolean = false,
+    ) : FlowState
     data class ReadBack(val sys: Int, val dia: Int, val pulse: Int, val via: Via) : FlowState
     data class Result(val sys: Int, val dia: Int, val pulse: Int, val result: BpResult) : FlowState
 }
@@ -28,7 +32,7 @@ class ReadingFlow(
         private set
 
     fun photoRead(reading: Triple<Int, Int, Int>?) {
-        state = accept(reading, Via.PHOTO) ?: FlowState.ManualEntry()
+        state = accept(reading, Via.PHOTO) ?: FlowState.ManualEntry(prefill = reading, photoFailed = true)
     }
 
     fun skipPhoto() { state = FlowState.ManualEntry() }

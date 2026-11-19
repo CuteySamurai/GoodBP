@@ -38,6 +38,20 @@ class CoreLogicTest {
         assertNull(MandarinNumberParser.parseReading("一百二十 八十"))
     }
 
+    @Test fun ocrConfusions() {
+        assertEquals(128, MonitorTextParser.normalise("I28"))
+        assertEquals(80, MonitorTextParser.normalise("8O"))
+        assertEquals(105, MonitorTextParser.normalise("1O5"))
+        assertNull(MonitorTextParser.normalise("SYS"))
+        assertNull(MonitorTextParser.normalise("mmHg"))
+        val toks = listOf(
+            MonitorTextParser.Token("SYS", 10, 10, 20), MonitorTextParser.Token("I32", 40, 100, 120),
+            MonitorTextParser.Token("mmHg", 60, 300, 15), MonitorTextParser.Token("8B", 200, 120, 120),
+            MonitorTextParser.Token("72", 360, 160, 60), MonitorTextParser.Token("12", 5, 400, 10),
+        )
+        assertEquals(Triple(132, 88, 72), MonitorTextParser.parseTokens(toks))
+    }
+
     @Test fun monitorOcr() {
         assertEquals(Triple(128, 79, 66), MonitorTextParser.parse(listOf("SYS mmHg", "128", "DIA", "79", "PULSE/min 66")))
         assertNull(MonitorTextParser.parse(listOf("128", "79")))
@@ -63,7 +77,7 @@ class CoreLogicTest {
     @Test fun failedPhotoGoesToManualAndBadNumbersStay() {
         val f = ReadingFlow(range) { _, _, _, _, _ -> }
         f.photoRead(null)
-        assertEquals(FlowState.ManualEntry(), f.state)
+        assertEquals(FlowState.ManualEntry(photoFailed = true), f.state)
         f.manualEntered(Triple(80, 120, 70)) // dia > sys: implausible
         assertEquals(FlowState.ManualEntry(prefill = Triple(80, 120, 70), invalid = true), f.state)
         val m = ReadingFlow(range, start = FlowState.ManualEntry()) { _, _, _, _, _ -> }

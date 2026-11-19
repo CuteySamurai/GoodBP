@@ -12,6 +12,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
 import com.goodbp.data.Settings
 import com.goodbp.ui.flow.ReadingScreen
 import com.goodbp.ui.main.MainScaffold
@@ -51,8 +53,12 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable("reading/{mode}") { entry ->
-                        ReadingScreen(alerts, startManual = entry.arguments?.getString("mode") == "manual",
-                            onFinished = { nav.popBackStack("main", false) })
+                        androidx.compose.foundation.layout.Box(
+                            androidx.compose.ui.Modifier.fillMaxSize().safeDrawingPadding()
+                        ) {
+                            ReadingScreen(alerts, startManual = entry.arguments?.getString("mode") == "manual",
+                                onFinished = { nav.popBackStack("main", false) })
+                        }
                     }
                 }
             }

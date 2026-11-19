@@ -96,7 +96,7 @@ fun ReadingScreen(alerts: FamilyAlerts, startManual: Boolean, onFinished: () -> 
     }
 
     when (val s = state) {
-        is FlowState.ManualEntry -> ManualEntry(s.prefill, s.invalid, onDone = { flow.manualEntered(it); sync() }, onCancel = onFinished)
+        is FlowState.ManualEntry -> ManualEntry(s.prefill, s.invalid, s.photoFailed, onDone = { flow.manualEntered(it); sync() }, onCancel = onFinished)
         else -> Column(
             Modifier.fillMaxSize().padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically),
