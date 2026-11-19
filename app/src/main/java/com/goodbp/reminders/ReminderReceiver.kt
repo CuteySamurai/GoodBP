@@ -25,11 +25,13 @@ class ReminderReceiver : BroadcastReceiver() {
         nm.createNotificationChannel(
             NotificationChannel(CHANNEL, context.getString(R.string.reminder_channel), NotificationManager.IMPORTANCE_HIGH)
         )
+        val code = if (isTest) 999_999 else ReminderScheduler.requestCode(kind, minutes, medId)
         val full = PendingIntent.getActivity(
-            context, minutes,
+            context, code,
             Intent(context, ReminderActivity::class.java)
                 .putExtras(intent)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                .putExtra(EXTRA_NOTIFICATION_ID, code)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_MULTIPLE_TASK),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         val text = context.getString(if (kind == ReminderScheduler.Kind.BP) R.string.say_reminder_bp else R.string.say_reminder_med)
@@ -41,11 +43,12 @@ class ReminderReceiver : BroadcastReceiver() {
             .setFullScreenIntent(full, true)
             .setOngoing(true)
             .build()
-        nm.notify(NOTIFICATION_ID, n)
+        nm.notify(code, n)
     }
 
     companion object {
         const val CHANNEL = "reminders"
         const val NOTIFICATION_ID = 1
+        const val EXTRA_NOTIFICATION_ID = "notification_id"
     }
 }

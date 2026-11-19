@@ -130,4 +130,25 @@
     <string name="say_cat_high">高</string>
     <string name="say_cat_crisis">非常高</string>
     <string name="photo_tip">提示：屏幕上不要有阴影或反光，手机拿正，让数字清楚。</string>
+    <string name="tab_meds">吃药</string>
+    <string name="meds_today">今天的药</string>
+    <string name="med_confirmed_at">已确认 %1$s</string>
+    <string name="med_not_confirmed">未确认</string>
+    <string name="med_upcoming">稍后</string>
+    <string name="med_none">还没有添加药物。家人可以在下面添加。</string>
+    <string name="med_list">药物（家人设置）</string>
+    <string name="med_add">添加药物</string>
+    <string name="med_edit">修改</string>
+    <string name="med_name">药名</string>
+    <string name="med_desc">怎么描述（会读出来），例如：白色小圆片</string>
+    <string name="med_photo">拍药片或药盒</string>
+    <string name="med_times">时间</string>
+    <string name="med_save">保存</string>
+    <string name="med_delete">删除</string>
+    <string name="med_delete_q">删除这个药和它的提醒？</string>
+    <string name="med_week">过去7天</string>
+    <string name="med_week_line">%2$d 次中确认 %1$d 次</string>
+    <string name="med_need_name_time">请填写药名，并至少添加一个时间。</string>
+    <string name="say_med_named">该吃药了。%1$s。%2$s。</string>
+    <string name="say_med_confirmed">好的，已记录。</string>
 </resources>

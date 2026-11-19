@@ -127,4 +127,25 @@
     <string name="say_cat_high">high</string>
     <string name="say_cat_crisis">very high</string>
     <string name="photo_tip">Tip: no shadow or glare on the screen. Hold the phone straight so all numbers are clear.</string>
+    <string name="tab_meds">Medicine</string>
+    <string name="meds_today">Today\'s medicine</string>
+    <string name="med_confirmed_at">Confirmed %1$s</string>
+    <string name="med_not_confirmed">Not confirmed</string>
+    <string name="med_upcoming">Later</string>
+    <string name="med_none">No medicine added yet. Family can add below.</string>
+    <string name="med_list">Medicines (family)</string>
+    <string name="med_add">Add medicine</string>
+    <string name="med_edit">Edit</string>
+    <string name="med_name">Name</string>
+    <string name="med_desc">How to describe it (spoken), e.g. small white round pill</string>
+    <string name="med_photo">Photo of pill or box</string>
+    <string name="med_times">Times</string>
+    <string name="med_save">Save</string>
+    <string name="med_delete">Delete</string>
+    <string name="med_delete_q">Delete this medicine and its reminders?</string>
+    <string name="med_week">Past 7 days</string>
+    <string name="med_week_line">%1$d of %2$d confirmed</string>
+    <string name="med_need_name_time">Please enter a name and at least one time.</string>
+    <string name="say_med_named">Time for your medicine. %1$s. %2$s.</string>
+    <string name="say_med_confirmed">Thank you. Recorded.</string>
 </resources>

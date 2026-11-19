@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material3.HorizontalDivider
@@ -43,10 +44,11 @@ import com.goodbp.R
 import com.goodbp.setup.SettingsTab
 import com.goodbp.ui.home.HomeTab
 import com.goodbp.ui.info.InfoTab
+import com.goodbp.ui.meds.MedicineTab
 import com.goodbp.ui.trend.TrendTab
 
 /**
- * Four big bottom tabs: Home · Trend · Info · Settings.
+ * Five big bottom tabs: Home · Medicine · Trend · Info · Settings.
  * Custom bar (not NavigationBar) so it can be tall with large icons and labels,
  * and it sits above the phone's own gesture/nav bar instead of under it.
  */
@@ -54,23 +56,24 @@ import com.goodbp.ui.trend.TrendTab
 fun MainScaffold(onPhoto: () -> Unit, onManual: () -> Unit, onLanguageChanged: () -> Unit) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
     val tabs = listOf(
-        Icons.Filled.Home to R.string.tab_home, Icons.Filled.Timeline to R.string.tab_trend,
+        Icons.Filled.Home to R.string.tab_home, Icons.Filled.Medication to R.string.tab_meds, Icons.Filled.Timeline to R.string.tab_trend,
         Icons.Filled.Info to R.string.tab_info, Icons.Filled.Settings to R.string.tab_settings,
     )
     Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding()) {
         Box(Modifier.weight(1f).fillMaxWidth()) {
             when (tab) {
                 0 -> HomeTab(onPhoto, onManual)
-                1 -> TrendTab()
-                2 -> InfoTab()
+                1 -> MedicineTab()
+                2 -> TrendTab()
+                3 -> InfoTab()
                 else -> SettingsTab(onLanguageChanged)
             }
         }
         HorizontalDivider()
         Row(
             Modifier.fillMaxWidth().background(Color(0xFFF7F9FC)).navigationBarsPadding().height(92.dp)
-                .padding(horizontal = 6.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                .padding(horizontal = 4.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             tabs.forEachIndexed { i, (icon, label) ->
                 TabItem(icon, stringResource(label), tab == i, Modifier.weight(1f)) { tab = i }
@@ -90,7 +93,7 @@ private fun TabItem(icon: ImageVector, label: String, selected: Boolean, m: Modi
         verticalArrangement = Arrangement.Center,
     ) {
         Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(34.dp))
-        Text(label, fontSize = 16.sp, color = color, maxLines = 1,
+        Text(label, fontSize = 14.sp, color = color, maxLines = 1,
             fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal)
     }
 }

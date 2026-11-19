@@ -128,4 +128,25 @@
     <string name="say_cat_high">tinggi</string>
     <string name="say_cat_crisis">sangat tinggi</string>
     <string name="photo_tip">Tips: jangan ada bayangan atau silau di layar. Pegang ponsel lurus agar semua angka jelas.</string>
+    <string name="tab_meds">Obat</string>
+    <string name="meds_today">Obat hari ini</string>
+    <string name="med_confirmed_at">Dikonfirmasi %1$s</string>
+    <string name="med_not_confirmed">Belum dikonfirmasi</string>
+    <string name="med_upcoming">Nanti</string>
+    <string name="med_none">Belum ada obat. Keluarga bisa menambah di bawah.</string>
+    <string name="med_list">Daftar obat (keluarga)</string>
+    <string name="med_add">Tambah obat</string>
+    <string name="med_edit">Ubah</string>
+    <string name="med_name">Nama obat</string>
+    <string name="med_desc">Cara menyebutnya (diucapkan), mis. pil bulat putih kecil</string>
+    <string name="med_photo">Foto pil atau kotak</string>
+    <string name="med_times">Waktu</string>
+    <string name="med_save">Simpan</string>
+    <string name="med_delete">Hapus</string>
+    <string name="med_delete_q">Hapus obat ini dan pengingatnya?</string>
+    <string name="med_week">7 hari terakhir</string>
+    <string name="med_week_line">%1$d dari %2$d dikonfirmasi</string>
+    <string name="med_need_name_time">Isi nama obat dan minimal satu waktu.</string>
+    <string name="say_med_named">Waktunya minum obat. %1$s. %2$s.</string>
+    <string name="say_med_confirmed">Terima kasih, sudah dicatat.</string>
 </resources>

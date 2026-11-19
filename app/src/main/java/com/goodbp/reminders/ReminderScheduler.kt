@@ -65,12 +65,15 @@ object ReminderScheduler {
             .putExtra(EXTRA_KIND, kind.name)
             .putExtra(EXTRA_MINUTES, minutes)
             .putExtra(EXTRA_MED_ID, medId)
-        val requestCode = (kind.ordinal * 100_000 + medId.toInt() * 1440 + minutes)
+        val requestCode = requestCode(kind, minutes, medId)
         return PendingIntent.getBroadcast(
             context, requestCode, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
     }
+
+    /** One code per (kind, medicine, time), so alarms and their screens never overwrite each other. */
+    fun requestCode(kind: Kind, minutes: Int, medId: Long): Int = kind.ordinal * 10_000_000 + medId.toInt() * 1440 + minutes
 
     enum class Kind { BP, MED }
 }

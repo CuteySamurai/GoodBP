@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -22,8 +23,16 @@ interface ReadingDao {
 @Dao
 interface MedicineDao {
     @Insert suspend fun insert(m: Medicine): Long
-    @Query("SELECT * FROM medicines") fun all(): Flow<List<Medicine>>
+    @Update suspend fun update(m: Medicine)
+    @Query("DELETE FROM medicines WHERE id = :id") suspend fun delete(id: Long)
+    @Query("SELECT * FROM medicines ORDER BY id") fun all(): Flow<List<Medicine>>
+    @Query("SELECT * FROM medicines ORDER BY id") suspend fun allOnce(): List<Medicine>
+    @Query("SELECT * FROM medicines WHERE id = :id") suspend fun get(id: Long): Medicine?
     @Insert suspend fun insertConfirmation(c: MedConfirmation): Long
+    @Query("SELECT * FROM med_confirmations WHERE dueAt >= :since ORDER BY dueAt")
+    fun confirmationsSince(since: Long): Flow<List<MedConfirmation>>
+    @Query("SELECT COUNT(*) FROM med_confirmations WHERE medicineId = :medId AND dueAt = :dueAt")
+    suspend fun countFor(medId: Long, dueAt: Long): Int
 }
 
 @Database(entities = [Reading::class, Medicine::class, MedConfirmation::class], version = 1)
