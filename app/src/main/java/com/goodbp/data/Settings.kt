@@ -25,6 +25,11 @@ class Settings(context: Context) {
         get() = p.getFloat("weight", 0f)
         set(v) = p.edit().putFloat("weight", v).apply()
 
+    /** Height in cm; 0 = not set. */
+    var heightCm: Int
+        get() = p.getInt("height", 0)
+        set(v) = p.edit().putInt("height", v).apply()
+
     var remindersOn: Boolean
         get() = p.getBoolean("reminders_on", true)
         set(v) = p.edit().putBoolean("reminders_on", v).apply()

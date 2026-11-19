@@ -71,6 +71,7 @@ private fun ProfileSection(settings: Settings) = Section(stringResource(R.string
     var name by remember { mutableStateOf(settings.name) }
     var age by remember { mutableStateOf(settings.age.toString()) }
     var weight by remember { mutableStateOf(if (settings.weightKg > 0) "%.1f".format(settings.weightKg) else "") }
+    var height by remember { mutableStateOf(if (settings.heightCm > 0) settings.heightCm.toString() else "") }
     var saved by remember { mutableStateOf(false) }
     OutlinedTextField(name, { name = it; saved = false }, Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.name)) }, singleLine = true)
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -80,11 +81,20 @@ private fun ProfileSection(settings: Settings) = Section(stringResource(R.string
         OutlinedTextField(weight, { weight = it.filter { c -> c.isDigit() || c == '.' }.take(5); saved = false }, Modifier.weight(1f),
             label = { Text(stringResource(R.string.weight_kg)) }, singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal))
+        OutlinedTextField(height, { height = it.filter(Char::isDigit).take(3); saved = false }, Modifier.weight(1f),
+            label = { Text(stringResource(R.string.height_cm)) }, singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+    }
+    val w = weight.toFloatOrNull(); val h = height.toIntOrNull()
+    if (w != null && w > 0 && h != null && h in 100..230) {
+        val bmi = w / ((h / 100f) * (h / 100f))
+        Text("BMI %.1f".format(bmi), fontSize = Small)
     }
     Button({
         settings.name = name.trim()
         age.toIntOrNull()?.let { settings.age = it }
         settings.weightKg = weight.toFloatOrNull() ?: 0f
+        settings.heightCm = height.toIntOrNull() ?: 0
         saved = true
     }, Modifier.fillMaxWidth()) { Text(stringResource(if (saved) R.string.saved else R.string.save)) }
 }
