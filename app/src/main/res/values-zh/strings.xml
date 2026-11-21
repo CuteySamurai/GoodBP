@@ -151,4 +151,6 @@
     <string name="med_need_name_time">请填写药名，并至少添加一个时间。</string>
     <string name="say_med_named">该吃药了。%1$s。%2$s。</string>
     <string name="say_med_confirmed">好的，已记录。</string>
+    <string name="report_title">血压记录</string>
+    <string name="ok">确定</string>
 </resources>

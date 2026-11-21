@@ -2,6 +2,8 @@ package com.goodbp.setup
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -121,11 +123,12 @@ private fun Section(title: String, content: @Composable () -> Unit) = Card(Modif
 
 private val Small = 17.sp
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun LanguageSection(settings: Settings, onChanged: () -> Unit) =
     Section(stringResource(R.string.language)) {
         val names = mapOf(AppLanguage.ZH to "中文", AppLanguage.EN to "English", AppLanguage.ID to "Bahasa Indonesia")
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             AppLanguage.entries.forEach { lang ->
                 FilterChip(selected = settings.language == lang,
                     onClick = { if (settings.language != lang) { settings.language = lang; onChanged() } },
@@ -194,7 +197,7 @@ private fun AlarmSection(settings: Settings) = Section(stringResource(R.string.r
         val state = rememberTimePickerState(initialHour = 8, initialMinute = 0, is24Hour = true)
         AlertDialog(
             onDismissRequest = { picking = false },
-            confirmButton = { TextButton({ save(times + (state.hour * 60 + state.minute)); picking = false }) { Text("OK") } },
+            confirmButton = { TextButton({ save(times + (state.hour * 60 + state.minute)); picking = false }) { Text(stringResource(R.string.ok)) } },
             dismissButton = { TextButton({ picking = false }) { Text(stringResource(R.string.cancel)) } },
             text = { TimePicker(state) },
         )

@@ -6,11 +6,33 @@ import com.goodbp.rules.BpRules
 
 /** Family-set configuration. SharedPreferences for the skeleton; move to DataStore later. */
 class Settings(context: Context) {
+    private val app: Context = context.applicationContext ?: context // null inside Application.attachBaseContext
     private val p = context.getSharedPreferences("goodbp", Context.MODE_PRIVATE)
 
+    /**
+     * App language. Chosen once from the phone's language on a fresh install, then
+     * only changed in Settings. Existing installs that never picked one stay Mandarin.
+     */
     var language: AppLanguage
-        get() = AppLanguage.valueOf(p.getString("lang", AppLanguage.ZH.name)!!)
+        get() {
+            p.getString("lang", null)?.let { saved ->
+                return runCatching { AppLanguage.valueOf(saved) }.getOrDefault(AppLanguage.ZH)
+            }
+            val firstRun = p.all.isEmpty() && isFreshInstall()
+            val picked = if (firstRun) AppLanguage.fromPhone(phoneLanguage()) else AppLanguage.ZH
+            p.edit().putString("lang", picked.name).apply()
+            return picked
+        }
         set(v) = p.edit().putString("lang", v.name).apply()
+
+    /** True on a new install, false after an app update (so current users keep Mandarin). */
+    private fun isFreshInstall(): Boolean = runCatching {
+        val info = app.packageManager.getPackageInfo(app.packageName, 0)
+        info.firstInstallTime == info.lastUpdateTime
+    }.getOrDefault(false)
+
+    private fun phoneLanguage(): String =
+        android.content.res.Resources.getSystem().configuration.locales[0]?.language ?: ""
 
     var age: Int
         get() = p.getInt("age", 75)
@@ -58,5 +80,15 @@ class Settings(context: Context) {
 enum class AppLanguage(val tag: String, val speechTag: String) {
     ZH("zh", "zh-CN"),
     EN("en", "en-US"),
-    ID("in", "id-ID"),
+    ID("in", "id-ID");
+
+    companion object {
+        /** Phone language code -> app language. Unknown languages fall back to Mandarin. */
+        fun fromPhone(code: String): AppLanguage = when (code.lowercase()) {
+            "zh" -> ZH
+            "id", "in" -> ID
+            "en" -> EN
+            else -> ZH
+        }
+    }
 }
