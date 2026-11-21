@@ -65,6 +65,7 @@ fun SettingsTab(onLanguageChanged: () -> Unit) {
         VoiceSection(settings)
         RangeSection(settings)
         PhoneSetupSection()
+        PrivacySection()
     }
 }
 
@@ -255,4 +256,12 @@ private fun PhoneSetupSection() = Section(stringResource(R.string.phone_setup)) 
         Button({ OemSetupGuide.openFullScreenSettings(context) }, Modifier.fillMaxWidth()) { Text(stringResource(R.string.setup_fullscreen_btn)) }
     }
     Text(stringResource(R.string.setup_steps), fontSize = 15.sp)
+}
+
+@Composable
+private fun PrivacySection() = Section(stringResource(R.string.privacy_policy)) {
+    var open by remember { mutableStateOf(false) }
+    Text(stringResource(R.string.privacy_summary), fontSize = Small)
+    Button({ open = true }, Modifier.fillMaxWidth()) { Text(stringResource(R.string.privacy_read_full)) }
+    if (open) com.goodbp.ui.privacy.PrivacyPolicyDialog { open = false }
 }

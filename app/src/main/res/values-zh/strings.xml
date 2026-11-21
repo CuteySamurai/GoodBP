@@ -155,4 +155,11 @@
     <string name="ok">确定</string>
     <string name="setup_fullscreen_status">允许全屏提醒：%1$s</string>
     <string name="setup_fullscreen_btn">4. 允许全屏提醒</string>
+    <string name="privacy_title">您的隐私</string>
+    <string name="privacy_policy">隐私政策</string>
+    <string name="privacy_summary">您的血压、药物和照片只保存在这部手机里。这个应用不上网，不会把任何资料发给我们。您可以随时删除资料。这个应用不是医生，不提供医疗建议。</string>
+    <string name="privacy_listen">🔊 再听一次</string>
+    <string name="privacy_read_full">查看完整隐私政策</string>
+    <string name="privacy_agree">同意</string>
+    <string name="privacy_full">生效日期：2026年11月21日\n\n简单来说：您输入的所有资料都只保存在手机里。应用没有网络权限、不需要账号、没有广告、没有数据分析。我们（开发者）不会收到您的血压、药物、照片或声音。\n\n保存的资料\n血压记录（高压、低压、脉搏、时间、拍照或手动输入）。药物（名称、说明、提醒时间、可选的药片照片，以及每次提醒是否确认）。设置（姓名、年龄、可选的体重和身高、医生设定的范围、提醒时间、语言）。全部只保存在本机应用的私有空间。\n\n声音\n您说话时，由手机自带的语音服务（例如谷歌）把声音转成文字。应用只收到文字，不保存录音。语音服务遵守它自己的隐私政策。\n\n照片\n血压计照片在手机上识别，下次拍照时会被替换。药片照片保存在手机上，删除该药物时一起删除。\n\n分享\n我们不出售、不分享您的资料。只有当您主动把PDF或CSV报告分享给其他应用时，资料才会离开本应用。\n\n手机备份\n如果手机设置中开启了备份，安卓可能会把本应用的资料包含在您自己的谷歌备份中。我们看不到这些资料。\n\n删除资料\n在记录列表中长按一条记录即可删除。删除药物会同时删除其照片。要删除全部资料，请卸载应用，或在手机设置中清除应用存储。\n\n健康\n本应用是记录和提醒工具，不是医疗器械，不提供诊断或医疗建议。请遵从医生的指导。\n\n变更\n如果以后的版本需要把资料发送出手机（例如家人提醒），我们会先更新本政策。\n\n联系\nopizapp@gmail.com</string>
 </resources>

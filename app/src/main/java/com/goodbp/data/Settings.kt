@@ -52,6 +52,11 @@ class Settings(context: Context) {
         get() = p.getInt("height", 0)
         set(v) = p.edit().putInt("height", v).apply()
 
+    /** Set once when the user taps Agree on the first-launch privacy notice. */
+    var privacyAccepted: Boolean
+        get() = p.getBoolean("privacy_ok", false)
+        set(v) = p.edit().putBoolean("privacy_ok", v).apply()
+
     var remindersOn: Boolean
         get() = p.getBoolean("reminders_on", true)
         set(v) = p.edit().putBoolean("reminders_on", v).apply()
