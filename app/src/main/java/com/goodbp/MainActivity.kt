@@ -12,6 +12,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.goodbp.ui.privacy.PrivacyConsentDialog
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
 import com.goodbp.data.Settings
@@ -44,12 +49,14 @@ class MainActivity : ComponentActivity() {
                 val nav = rememberNavController()
                 NavHost(nav, startDestination = "main") {
                     composable("main") {
-                        LaunchedEffect(Unit) { if (pendingStart) { pendingStart = false; nav.navigate("reading/photo") } }
+                        var accepted by remember { mutableStateOf(Settings(this@MainActivity).privacyAccepted) }
+                        LaunchedEffect(accepted) { if (accepted && pendingStart) { pendingStart = false; nav.navigate("reading/photo") } }
                         MainScaffold(
                             onPhoto = { nav.navigate("reading/photo") },
                             onManual = { nav.navigate("reading/manual") },
                             onLanguageChanged = { recreate() },
                         )
+                        if (!accepted) PrivacyConsentDialog { accepted = true }
                     }
                     composable("reading/{mode}") { entry ->
                         androidx.compose.foundation.layout.Box(
