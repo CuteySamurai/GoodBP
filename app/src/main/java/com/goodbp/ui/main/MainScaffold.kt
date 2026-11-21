@@ -71,7 +71,7 @@ fun MainScaffold(onPhoto: () -> Unit, onManual: () -> Unit, onLanguageChanged: (
         }
         HorizontalDivider()
         Row(
-            Modifier.fillMaxWidth().background(Color(0xFFF7F9FC)).navigationBarsPadding().height(92.dp)
+            Modifier.fillMaxWidth().background(com.goodbp.ui.theme.Palette.MintTint).navigationBarsPadding().height(92.dp)
                 .padding(horizontal = 4.dp, vertical = 6.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {

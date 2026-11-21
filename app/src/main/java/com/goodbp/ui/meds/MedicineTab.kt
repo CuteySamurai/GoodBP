@@ -122,9 +122,9 @@ private fun DoseCard(d: Dose, conf: MedConfirmation?, now: Long, onSpeak: () -> 
     val due = now >= d.dueAt - EARLY_MS
     val late = conf == null && now > d.dueAt + LATE_MS
     val bg = when {
-        conf != null -> Color(0xFFE8F5E9)
+        conf != null -> com.goodbp.ui.theme.Palette.MintTint
         late -> Color(0xFFFFEBEE)
-        due -> Color(0xFFFFF3E0)
+        due -> com.goodbp.ui.theme.Palette.YellowTint
         else -> Color(0xFFF5F5F5)
     }
     Card(Modifier.fillMaxWidth().clickable(onClick = onSpeak), colors = CardDefaults.cardColors(containerColor = bg)) {
@@ -144,7 +144,7 @@ private fun DoseCard(d: Dose, conf: MedConfirmation?, now: Long, onSpeak: () -> 
                 due -> {
                     if (late) Text(stringResource(R.string.med_not_confirmed), fontSize = 18.sp, color = Color(0xFFC62828))
                     Button(onConfirm, Modifier.fillMaxWidth().height(76.dp), shape = RoundedCornerShape(20.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF6C00))) {
+                        colors = ButtonDefaults.buttonColors(containerColor = com.goodbp.ui.theme.Palette.Yellow, contentColor = Color.Black)) {
                         Text("💊 " + stringResource(R.string.took_medicine), fontSize = 28.sp)
                     }
                 }

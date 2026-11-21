@@ -134,7 +134,7 @@ class ReminderActivity : ComponentActivity() {
                                     }
                                 },
                                 shape = CircleShape,
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF6C00)),
+                                colors = ButtonDefaults.buttonColors(containerColor = com.goodbp.ui.theme.Palette.Yellow, contentColor = Color.Black),
                                 modifier = Modifier.fillMaxWidth(if (list.size <= 1) 0.8f else 0.6f).aspectRatio(1f),
                             ) { Text("💊\n" + stringResource(R.string.took_medicine), fontSize = 40.sp, textAlign = TextAlign.Center) }
                         }

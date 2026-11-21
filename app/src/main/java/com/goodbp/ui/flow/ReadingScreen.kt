@@ -107,8 +107,8 @@ fun ReadingScreen(alerts: FamilyAlerts, startManual: Boolean, onFinished: () -> 
                     else {
                         Big("📷  " + stringResource(R.string.take_photo)) { openCamera() }
                         Text("💡 " + stringResource(R.string.photo_tip), fontSize = 18.sp, color = Color(0xFF616161))
-                        Big("✏️  " + stringResource(R.string.manual), Color(0xFF455A64)) { flow.skipPhoto(); sync() }
-                        Big(stringResource(R.string.back), Color(0xFFBDBDBD), height = 80) { onFinished() }
+                        Big("✏️  " + stringResource(R.string.manual), com.goodbp.ui.theme.Palette.BlueDeep) { flow.skipPhoto(); sync() }
+                        Big(stringResource(R.string.back), com.goodbp.ui.theme.Palette.Blue, height = 80) { onFinished() }
                     }
                 }
                 is FlowState.ReadBack -> {

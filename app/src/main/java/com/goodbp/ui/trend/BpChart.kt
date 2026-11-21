@@ -22,9 +22,9 @@ val SysColor = Color(0xFF2E7D32)
 val DiaColor = Color(0xFF1565C0)
 val PulseColor = Color(0xFFC62828)
 
-val MorningColor = Color(0xFFF57C00)
-val AfternoonColor = Color(0xFF43A047)
-val EveningColor = Color(0xFF1E88E5)
+val MorningColor = Color(0xFFC9A800) // palette yellow, deepened to show on white
+val AfternoonColor = Color(0xFF8E9C2A) // palette lime, deepened
+val EveningColor = com.goodbp.ui.theme.Palette.BlueDeep
 
 /** 0 = morning (<12), 1 = afternoon (12-17), 2 = evening (18+). */
 fun partOf(hour: Int) = when { hour < 12 -> 0; hour < 18 -> 1; else -> 2 }

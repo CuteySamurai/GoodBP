@@ -29,7 +29,7 @@ fun MedPhoto(path: String?, size: Dp, version: Int = 0) {
     if (bmp != null) {
         Image(bmp.asImageBitmap(), null, Modifier.size(size).clip(RoundedCornerShape(14)), contentScale = ContentScale.Crop)
     } else {
-        Box(Modifier.size(size).background(Color(0xFFE3F2FD), RoundedCornerShape(14)), contentAlignment = Alignment.Center) {
+        Box(Modifier.size(size).background(com.goodbp.ui.theme.Palette.MintTint, RoundedCornerShape(14)), contentAlignment = Alignment.Center) {
             Text("💊", fontSize = (size.value / 2.2f).sp)
         }
     }

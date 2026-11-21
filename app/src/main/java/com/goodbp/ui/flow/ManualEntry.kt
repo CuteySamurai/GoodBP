@@ -71,7 +71,7 @@ fun ManualEntry(
             val (code, name, color) = meta
             Row(
                 Modifier.fillMaxWidth().height(96.dp)
-                    .background(if (active == i) color.copy(alpha = 0.10f) else Color(0xFFF5F5F5), RoundedCornerShape(16.dp))
+                    .background(if (active == i) color.copy(alpha = 0.10f) else com.goodbp.ui.theme.Palette.MintTint, RoundedCornerShape(16.dp))
                     .border(if (active == i) 4.dp else 1.dp, if (active == i) color else Color.LightGray, RoundedCornerShape(16.dp))
                     .clickable { active = i }
                     .padding(horizontal = 16.dp),
@@ -111,14 +111,14 @@ fun ManualEntry(
                             modifier = Modifier.weight(1f).fillMaxSize(),
                             shape = RoundedCornerShape(14.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = when { isOk -> Color(0xFF1B7F3B); k == "⌫" -> Color(0xFF9E9E9E); else -> Color(0xFF37474F) }),
+                                containerColor = when { isOk -> Color(0xFF1B7F3B); k == "⌫" -> Color(0xFF9E9E9E); else -> com.goodbp.ui.theme.Palette.TealDeep }),
                         ) { Text(k, fontSize = 36.sp) }
                     }
                 }
             }
         }
         Button(onCancel, Modifier.fillMaxWidth().height(64.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBDBDBD), contentColor = Color.Black)) {
+            colors = ButtonDefaults.buttonColors(containerColor = com.goodbp.ui.theme.Palette.Mint, contentColor = Color.Black)) {
             Text(stringResource(R.string.back), fontSize = 24.sp)
         }
     }

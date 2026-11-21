@@ -55,7 +55,7 @@ fun BigButtonScreen(
                 // Second, clearly smaller button so the main action stays obvious.
                 Button(
                     onClick = onSecondary,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5F6368)),
+                    colors = ButtonDefaults.buttonColors(containerColor = com.goodbp.ui.theme.Palette.BlueDeep),
                     modifier = Modifier.fillMaxWidth().height(120.dp),
                 ) {
                     Text(secondaryLabel, style = MaterialTheme.typography.headlineLarge)

@@ -72,7 +72,7 @@ fun HomeTab(onPhoto: () -> Unit, onManual: () -> Unit) {
                 }
             }
             Button(onManual, Modifier.weight(1f).height(140.dp), shape = RoundedCornerShape(20.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF455A64))) {
+                colors = ButtonDefaults.buttonColors(containerColor = com.goodbp.ui.theme.Palette.BlueDeep)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("✏️", fontSize = 44.sp)
                     Text(stringResource(R.string.manual), fontSize = 26.sp)
