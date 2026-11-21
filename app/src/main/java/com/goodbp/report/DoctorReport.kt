@@ -32,14 +32,21 @@ object DoctorReport {
         val fmt = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
         var page = doc.startPage(PdfDocument.PageInfo.Builder(595, 842, 1).create())
         var y = 40f
-        page.canvas.drawText("Blood pressure log / 血压记录", 40f, y, paint.apply { textSize = 16f }); paint.textSize = 11f
+        page.canvas.drawText(context.getString(com.goodbp.R.string.report_title), 40f, y, paint.apply { textSize = 16f }); paint.textSize = 11f
         y += 30f
+        val pulse = context.getString(com.goodbp.R.string.pulse)
+        fun result(r: Reading) = when (r.result) {
+            "HIGH" -> context.getString(com.goodbp.R.string.result_high)
+            "LOW" -> context.getString(com.goodbp.R.string.result_low)
+            "NORMAL" -> context.getString(com.goodbp.R.string.result_normal)
+            else -> r.result
+        }
         readings.forEachIndexed { i, r ->
             if (y > 800f) {
                 doc.finishPage(page)
                 page = doc.startPage(PdfDocument.PageInfo.Builder(595, 842, i + 2).create()); y = 40f
             }
-            page.canvas.drawText("${fmt.format(Date(r.takenAt))}   ${r.systolic}/${r.diastolic}   pulse ${r.pulse}   ${r.result}", 40f, y, paint)
+            page.canvas.drawText("${fmt.format(Date(r.takenAt))}   ${r.systolic}/${r.diastolic}   $pulse ${r.pulse}   ${result(r)}", 40f, y, paint)
             y += 16f
         }
         doc.finishPage(page)

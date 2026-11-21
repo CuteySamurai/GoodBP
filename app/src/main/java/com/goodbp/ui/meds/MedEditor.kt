@@ -125,7 +125,7 @@ fun MedEditor(original: Medicine, onClose: () -> Unit) {
         val state = rememberTimePickerState(initialHour = 8, initialMinute = 0, is24Hour = true)
         AlertDialog(
             onDismissRequest = { picking = false },
-            confirmButton = { TextButton({ times = (times + (state.hour * 60 + state.minute)).distinct().sorted(); picking = false }) { Text("OK") } },
+            confirmButton = { TextButton({ times = (times + (state.hour * 60 + state.minute)).distinct().sorted(); picking = false }) { Text(stringResource(R.string.ok)) } },
             dismissButton = { TextButton({ picking = false }) { Text(stringResource(R.string.cancel)) } },
             text = { TimePicker(state) },
         )

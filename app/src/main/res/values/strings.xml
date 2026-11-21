@@ -148,4 +148,6 @@
     <string name="med_need_name_time">Please enter a name and at least one time.</string>
     <string name="say_med_named">Time for your medicine. %1$s. %2$s.</string>
     <string name="say_med_confirmed">Thank you. Recorded.</string>
+    <string name="report_title">Blood pressure log</string>
+    <string name="ok">OK</string>
 </resources>

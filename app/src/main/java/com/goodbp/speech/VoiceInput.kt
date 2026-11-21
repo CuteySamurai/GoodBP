@@ -43,20 +43,12 @@ class VoiceInput(context: Context, private val language: AppLanguage) {
     fun destroy() = recognizer.destroy()
 
     companion object {
-        /** First candidate that yields three numbers. */
-        fun pickReading(candidates: List<String>): Triple<Int, Int, Int>? =
-            candidates.firstNotNullOfOrNull { MandarinNumberParser.parseReading(it) }
+        /** First candidate that yields three numbers, using the parser for the app language. */
+        fun pickReading(candidates: List<String>, language: AppLanguage): Triple<Int, Int, Int>? =
+            candidates.firstNotNullOfOrNull { NumberParsers.parseReading(it, language) }
 
-        /** 对 / 不对 detection. Check "no" first because 不对 contains 对. */
-        fun parseYesNo(candidates: List<String>, language: AppLanguage): Boolean? {
-            val text = candidates.joinToString(" ").lowercase()
-            val no = listOf("不对", "不是", "错", "no", "bukan", "tidak")
-            val yes = listOf("对", "是", "没错", "yes", "ya", "betul")
-            return when {
-                no.any { it in text } -> false
-                yes.any { it in text } -> true
-                else -> null
-            }
-        }
+        /** Yes / no detection for the read-back. Returns null when unclear (ask again). */
+        fun parseYesNo(candidates: List<String>, language: AppLanguage): Boolean? =
+            YesNo.parse(candidates.joinToString(" "), language)
     }
 }
