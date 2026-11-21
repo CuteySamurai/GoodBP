@@ -8,15 +8,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.semantics.Role
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,42 +33,41 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.goodbp.R
 import com.goodbp.data.Settings
-import com.goodbp.speech.Speaker
 
 /**
- * One-time privacy notice on first launch. The main user may not read, so the short
- * summary is spoken aloud when it opens, with a Listen button to repeat it.
- * Cannot be dismissed by back/outside tap; only Agree closes it.
+ * One-time privacy notice on first launch. The box must be ticked before Agree works,
+ * and the dialog can't be dismissed with Back or an outside tap.
  */
 @Composable
 fun PrivacyConsentDialog(onAgree: () -> Unit) {
     val context = LocalContext.current
     val settings = remember { Settings(context) }
-    val speaker = remember { Speaker(context, settings.language) }
-    DisposableEffect(Unit) { onDispose { speaker.shutdown() } }
-    val summary = stringResource(R.string.privacy_summary)
-    LaunchedEffect(Unit) { speaker.say(summary) }
+    var ticked by remember { mutableStateOf(false) }
     var showFull by remember { mutableStateOf(false) }
 
-    Dialog(onDismissRequest = {}, properties = DialogProperties(
-        dismissOnBackPress = false, dismissOnClickOutside = false, usePlatformDefaultWidth = false)) {
-        Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            Column(
-                Modifier.fillMaxSize().padding(24.dp).verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(20.dp),
-            ) {
-                Text(stringResource(R.string.privacy_title), style = MaterialTheme.typography.headlineLarge)
-                Text(summary, fontSize = 22.sp, lineHeight = 32.sp)
-                OutlinedButton({ speaker.say(summary) }, Modifier.fillMaxWidth().height(64.dp)) {
-                    Text(stringResource(R.string.privacy_listen), fontSize = 20.sp)
-                }
-                TextButton({ showFull = true }) { Text(stringResource(R.string.privacy_read_full), fontSize = 18.sp) }
-                Button({ settings.privacyAccepted = true; onAgree() }, Modifier.fillMaxWidth().height(88.dp)) {
-                    Text(stringResource(R.string.privacy_agree), fontSize = 28.sp)
+    AlertDialog(
+        onDismissRequest = {},
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        title = { Text(stringResource(R.string.privacy_title)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(stringResource(R.string.privacy_summary), fontSize = 18.sp, lineHeight = 26.sp)
+                TextButton({ showFull = true }) { Text(stringResource(R.string.privacy_read_full), fontSize = 17.sp) }
+                Row(
+                    Modifier.fillMaxWidth().toggleable(ticked, role = Role.Checkbox) { ticked = it },
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(ticked, onCheckedChange = null)
+                    Text(stringResource(R.string.privacy_tick), fontSize = 17.sp, modifier = Modifier.padding(start = 8.dp))
                 }
             }
-        }
-    }
+        },
+        confirmButton = {
+            Button({ settings.privacyAccepted = true; onAgree() }, enabled = ticked) {
+                Text(stringResource(R.string.privacy_agree), fontSize = 20.sp)
+            }
+        },
+    )
     if (showFull) PrivacyPolicyDialog { showFull = false }
 }
 
