@@ -151,4 +151,6 @@
     <string name="say_med_confirmed">Terima kasih, sudah dicatat.</string>
     <string name="report_title">Catatan tekanan darah</string>
     <string name="ok">OK</string>
+    <string name="setup_fullscreen_status">Pengingat layar penuh diizinkan: %1$s</string>
+    <string name="setup_fullscreen_btn">4. Izinkan pengingat layar penuh</string>
 </resources>

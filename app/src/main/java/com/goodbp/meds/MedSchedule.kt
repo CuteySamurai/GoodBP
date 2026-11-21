@@ -43,6 +43,22 @@ object MedSchedule {
         set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
     }.timeInMillis
 
+    /**
+     * The dose a reminder belongs to: the latest time at this minute that is not more
+     * than an hour in the future. A 23:30 reminder pressed at 00:10 stays yesterday's dose.
+     */
+    fun doseAt(minutes: Int, now: Calendar = Calendar.getInstance()): Long {
+        val t = todayAt(minutes, now)
+        if (t <= now.timeInMillis + 60 * 60_000L) return t
+        return (now.clone() as Calendar).apply {
+            timeInMillis = t; add(Calendar.DAY_OF_YEAR, -1)
+        }.timeInMillis
+    }
+
+    /** All medicines due at this minute of the day (several can share a time). */
+    suspend fun dueAt(context: Context, minutes: Int): List<Medicine> =
+        GoodBpDatabase.get(context).medicines().allOnce().filter { minutes in parse(it.timesOfDay) }
+
     /** She pressed "I took it" for this dose. Recorded once per dose. */
     suspend fun confirm(context: Context, medId: Long, dueAt: Long) {
         val dao = GoodBpDatabase.get(context).medicines()

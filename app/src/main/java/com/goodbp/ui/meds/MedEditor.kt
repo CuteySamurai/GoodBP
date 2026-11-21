@@ -138,6 +138,7 @@ fun MedEditor(original: Medicine, onClose: () -> Unit) {
                     scope.launch {
                         MedSchedule.cancel(context, original)
                         dao.delete(original.id)
+                        dao.deleteConfirmations(original.id)
                         original.pillPhotoPath?.let { File(it).delete() }
                         askDelete = false
                         onClose()

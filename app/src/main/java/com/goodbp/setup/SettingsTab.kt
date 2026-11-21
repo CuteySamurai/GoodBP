@@ -248,5 +248,11 @@ private fun PhoneSetupSection() = Section(stringResource(R.string.phone_setup)) 
     Button({ OemSetupGuide.requestIgnoreBatteryOptimizations(context) }, Modifier.fillMaxWidth()) { Text(stringResource(R.string.setup_battery_btn)) }
     Button({ OemSetupGuide.openAutoStartSettings(context) }, Modifier.fillMaxWidth()) { Text(stringResource(R.string.setup_autostart_btn)) }
     Button({ OemSetupGuide.openNotificationSettings(context) }, Modifier.fillMaxWidth()) { Text(stringResource(R.string.setup_notif_btn)) }
+    if (android.os.Build.VERSION.SDK_INT >= 34) {
+        val full = OemSetupGuide.canUseFullScreen(context)
+        Text(stringResource(R.string.setup_fullscreen_status, stringResource(if (full) R.string.yes_mark else R.string.no_mark)), fontSize = Small,
+            color = if (full) androidx.compose.ui.graphics.Color.Unspecified else MaterialTheme.colorScheme.error)
+        Button({ OemSetupGuide.openFullScreenSettings(context) }, Modifier.fillMaxWidth()) { Text(stringResource(R.string.setup_fullscreen_btn)) }
+    }
     Text(stringResource(R.string.setup_steps), fontSize = 15.sp)
 }

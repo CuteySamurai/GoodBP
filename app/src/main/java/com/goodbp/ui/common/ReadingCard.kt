@@ -91,14 +91,23 @@ fun startOfDay(c: Calendar): Long = (c.clone() as Calendar).apply {
 /** What gets spoken when a reading is tapped. */
 fun spoken(context: Context, r: Reading): String = spokenSummary(context, r.takenAt, r.systolic, r.diastolic, r.pulse)
 
-/** "When. Top x, bottom y, pulse z. Your blood pressure is high." (reference chart word, no advice) */
+/**
+ * "When. Top x, bottom y, pulse z. Your blood pressure is high."
+ * The word comes from the doctor's range, the same rule as the word on screen,
+ * so what she hears and what she sees always agree. "Very high" is added only
+ * above the chart's crisis line (SYS > 180 or DIA > 110). No advice.
+ */
 fun spokenSummary(context: Context, takenAt: Long, sys: Int, dia: Int, pulse: Int): String {
-    val word = context.getString(when (com.goodbp.rules.BpCategory.of(sys, dia)) {
-        com.goodbp.rules.BpCategory.LOW -> R.string.say_cat_low
-        com.goodbp.rules.BpCategory.NORMAL -> R.string.say_cat_normal
-        com.goodbp.rules.BpCategory.PRE -> R.string.say_cat_pre
-        com.goodbp.rules.BpCategory.STAGE1, com.goodbp.rules.BpCategory.STAGE2 -> R.string.say_cat_high
-        com.goodbp.rules.BpCategory.CRISIS -> R.string.say_cat_crisis
-    })
+    val word = context.getString(spokenWordRes(sys, dia, com.goodbp.data.Settings(context).range()))
     return context.getString(R.string.say_summary, whenLabel(context, takenAt), sys, dia, pulse, word)
 }
+
+/** Spoken word for a reading: doctor's range first, crisis line on top of HIGH. */
+fun spokenWordRes(sys: Int, dia: Int, range: com.goodbp.rules.BpRange): Int =
+    when (com.goodbp.rules.BpRules.classify(sys, dia, range)) {
+        com.goodbp.rules.BpResult.LOW -> R.string.say_cat_low
+        com.goodbp.rules.BpResult.NORMAL -> R.string.say_cat_normal
+        com.goodbp.rules.BpResult.HIGH ->
+            if (com.goodbp.rules.BpCategory.of(sys, dia) == com.goodbp.rules.BpCategory.CRISIS) R.string.say_cat_crisis
+            else R.string.say_cat_high
+    }

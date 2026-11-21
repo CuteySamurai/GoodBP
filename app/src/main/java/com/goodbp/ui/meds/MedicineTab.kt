@@ -166,7 +166,7 @@ private fun WeekSummary(meds: List<Medicine>, confs: List<MedConfirmation>, now:
                 val cal = Calendar.getInstance().apply { timeInMillis = dayStart }
                 // Only doses whose time has come count (today's later ones don't).
                 val due = meds.sumOf { m -> MedSchedule.parse(m.timesOfDay).count { dayStart + it * 60_000L <= now } }
-                val done = confs.count { it.dueAt in dayStart until dayStart + 86_400_000L }
+                val done = confs.count { c -> c.dueAt in dayStart until dayStart + 86_400_000L && meds.any { it.id == c.medicineId } }
                 if (due == 0 && done == 0) continue
                 val full = done >= due
                 Row(Modifier.fillMaxWidth()) {

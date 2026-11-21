@@ -2,6 +2,7 @@ package com.goodbp.speech
 
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
@@ -18,8 +19,9 @@ import java.util.UUID
  * Voice quality: phone-maker TTS engines (e.g. on Oppo) often sound robotic or have no
  * proper Mandarin voice. We prefer Google's engine when installed, and pick the
  * best-quality voice for the language.
+ * alarm = true (reminders): plays on the alarm volume, so a low media volume can't silence it.
  */
-class Speaker(context: Context, private val language: AppLanguage) {
+class Speaker(context: Context, private val language: AppLanguage, private val alarm: Boolean = false) {
 
     private val context = context.applicationContext
     private var ready = false
@@ -43,6 +45,7 @@ class Speaker(context: Context, private val language: AppLanguage) {
 
     private fun configure() {
         val locale = Locale.forLanguageTag(language.speechTag)
+        if (alarm) tts.setAudioAttributes(attrs())
         val avail = tts.setLanguage(locale)
         val voice = bestVoice(locale)
         if (voice != null) tts.voice = voice
@@ -77,10 +80,18 @@ class Speaker(context: Context, private val language: AppLanguage) {
     fun sayPrompt(key: String, fallbackText: String, onDone: () -> Unit = {}) {
         val resId = context.resources.getIdentifier("${key}_${language.tag}", "raw", context.packageName)
         if (resId != 0) {
-            MediaPlayer.create(context, resId)?.apply {
+            val player = runCatching {
+                MediaPlayer().apply {
+                    if (alarm) setAudioAttributes(attrs())
+                    context.resources.openRawResourceFd(resId).use { setDataSource(it.fileDescriptor, it.startOffset, it.length) }
+                    prepare()
+                }
+            }.getOrNull()
+            if (player == null) say(fallbackText, onDone)
+            else player.apply {
                 setOnCompletionListener { it.release(); onDone() }
                 start()
-            } ?: say(fallbackText, onDone)
+            }
         } else {
             say(fallbackText, onDone)
         }
@@ -96,6 +107,11 @@ class Speaker(context: Context, private val language: AppLanguage) {
         })
         tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, id)
     }
+
+    private fun attrs() = AudioAttributes.Builder()
+        .setUsage(AudioAttributes.USAGE_ALARM)
+        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+        .build()
 
     fun shutdown() { tts.stop(); tts.shutdown() }
 

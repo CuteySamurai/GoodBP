@@ -21,6 +21,21 @@ object OemSetupGuide {
     fun isIgnoringBatteryOptimizations(context: Context): Boolean =
         context.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(context.packageName)
 
+    /** Android 14+: the phone may switch off full-screen reminders; then only a small notification shows. */
+    fun canUseFullScreen(context: Context): Boolean =
+        Build.VERSION.SDK_INT < 34 ||
+            context.getSystemService(android.app.NotificationManager::class.java).canUseFullScreenIntent()
+
+    fun openFullScreenSettings(context: Context) {
+        if (Build.VERSION.SDK_INT < 34) return
+        runCatching {
+            context.startActivity(
+                Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT, Uri.parse("package:${context.packageName}"))
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
+        }.onFailure { openNotificationSettings(context) }
+    }
+
     fun requestIgnoreBatteryOptimizations(context: Context) {
         context.startActivity(
             Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:${context.packageName}"))

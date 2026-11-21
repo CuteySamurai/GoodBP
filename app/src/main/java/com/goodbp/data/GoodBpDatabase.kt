@@ -25,6 +25,7 @@ interface MedicineDao {
     @Insert suspend fun insert(m: Medicine): Long
     @Update suspend fun update(m: Medicine)
     @Query("DELETE FROM medicines WHERE id = :id") suspend fun delete(id: Long)
+    @Query("DELETE FROM med_confirmations WHERE medicineId = :id") suspend fun deleteConfirmations(id: Long)
     @Query("SELECT * FROM medicines ORDER BY id") fun all(): Flow<List<Medicine>>
     @Query("SELECT * FROM medicines ORDER BY id") suspend fun allOnce(): List<Medicine>
     @Query("SELECT * FROM medicines WHERE id = :id") suspend fun get(id: Long): Medicine?

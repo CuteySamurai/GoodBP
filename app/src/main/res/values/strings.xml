@@ -150,4 +150,6 @@
     <string name="say_med_confirmed">Thank you. Recorded.</string>
     <string name="report_title">Blood pressure log</string>
     <string name="ok">OK</string>
+    <string name="setup_fullscreen_status">Full-screen reminders allowed: %1$s</string>
+    <string name="setup_fullscreen_btn">4. Allow full-screen reminders</string>
 </resources>

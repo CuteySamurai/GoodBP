@@ -153,4 +153,6 @@
     <string name="say_med_confirmed">好的，已记录。</string>
     <string name="report_title">血压记录</string>
     <string name="ok">确定</string>
+    <string name="setup_fullscreen_status">允许全屏提醒：%1$s</string>
+    <string name="setup_fullscreen_btn">4. 允许全屏提醒</string>
 </resources>
